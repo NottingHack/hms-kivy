@@ -1,0 +1,288 @@
+#:kivy 1.0
+
+#:set quorumNotMet (1, 0, 0, .8)
+#:set quorumMet (0, 1, 0, .8)
+#:set hsGreen (0.098, 0.349, 0.02, 0.9)
+#:set border (0, 0, 0, 1)
+
+<ConnectScreen>:
+    name: 'connect'
+    clientId: clientId
+    clientSecret: clientSecret
+    btn: btn
+    prodSwitch: prodSwitch
+
+    canvas:
+        Color:
+            rgba: hsGreen
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        Label:
+            text: "ID: "
+            font_size: (root.width**2 + root.height**2) / 13**4
+            pos_hint: {"x":0.1, "top":0.9}
+            size_hint: 0.09, 0.15
+        TextInput:
+            id: clientId
+            font_size: (root.width**2 + root.height**2) / 13**4
+            multiline: False
+            pos_hint: {"x": 0.27 , "top":0.9}
+            size_hint: 0.70, 0.15
+        Label:
+            text: "Secret: "
+            font_size: (root.width**2 + root.height**2) / 13**4
+            pos_hint: {"x":0.1, "top":0.7}
+            size_hint: 0.09, 0.15
+        TextInput:
+            id: clientSecret
+            font_size: (root.width**2 + root.height**2) / 13**4
+            multiline: False
+            pos_hint: {"x": 0.27, "top":0.7}
+            size_hint: 0.70, 0.15
+        Label:
+            text: "Prod: "
+            font_size: (root.width**2 + root.height**2) / 13**4
+            pos_hint:{"x":0.1,"y":0.3}
+            size_hint: 0.09, 0.15
+        Switch:
+            id: prodSwitch
+            pos_hint:{"x":0.27,"y":0.3}
+            size_hint: 0.1, 0.15
+        Button:
+            id: btn
+            pos_hint:{"x":0.05,"y":0.05}
+            size_hint: 0.9, 0.2
+            font_size: (root.width**2 + root.height**2) / 13**4
+            text: "Connect"
+            on_release:
+                root.manager.transition.direction = "up"
+                root.connectBtn()
+
+<CheckInScreen>:
+    name: "checkIn"
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: dp(5),dp(2),dp(5),dp(2)
+            spacing: dp(5)
+            BoxLayout:
+                orientation: 'vertical'
+                canvas:
+                    Color:
+                        rgba: hsGreen
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'Quorum'
+                    font_size: '27sp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+                    size_hint: 1, 0.25
+                    canvas.before:
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                GridLayout:
+                    cols:2
+                    padding: dp(2),dp(2),dp(2),dp(2)
+                    spacing: dp(2)
+                    canvas.before:
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    Label:
+                        text: 'Current Members'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.currentMembers
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+                    Label:
+                        text: 'Voting Members'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.votingMembers
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+                    Label:
+                        text: 'Quorum Required'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.quorum
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+
+            BoxLayout:
+                orientation: 'vertical'
+                canvas:
+                    Color:
+                        rgba: hsGreen
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'Current Attendance'
+                    font_size: '27sp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+                    size_hint: 1, 0.25
+                    canvas.before:
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+
+                GridLayout:
+                    cols:2
+                    padding: dp(2),dp(2),dp(2),dp(2)
+                    spacing: dp(2)
+                    canvas.before:
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    Label:
+                        text: 'Proxies Registered'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.proxies
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+                    Label:
+                        text: 'Attendees in the room'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.attendees
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+                    Label:
+                        text: 'Proxies Represented'
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                    Label:
+                        text: root.representedProxies
+                        font_size: '22sp'
+                        text_size: self.size
+                        halign: 'center'
+                        valign: 'middle'
+                        size_hint_x: 0.25
+            BoxLayout:
+                orientation: 'vertical'
+                canvas:
+                    Color:
+                        rgba: hsGreen
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'Total Checked-in'
+                    font_size: '27sp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+                    size_hint: 1, 0.25
+                    canvas.before:
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                Label:
+                    canvas.before:
+                        Color:
+                            rgba: quorumMet if root.quorumMetState else quorumNotMet
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                        Color:
+                            rgba: border
+                        Line:
+                            width: 2
+                            rectangle: self.x, self.y, self.width, self.height
+                    id: total_check_in
+                    text: root.checkInCount
+                    font_size: '100sp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+
+        Label:
+            id: status
+            size_hint: 1, 0.15
+            text: root.statusMessage
+            font_size: '35sp'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+#MeetingSignInApp
+GridLayout:
+    rows: 2
+    size_hint: 1, 1
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(40)
+        pos_hint: {'top': 1, 'y': 0}
+        padding: 5,2,5,2
+        spacing: 5
+        Label:
+            id: title
+            text: 'Enter HMS Client Credentials'
+            font_size: '35sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        ClockLabel:
+            id: clock_label
+            size_hint: 0.25,1
+            font_size: '35sp'
+            text_size: self.size
+            valign: 'middle'
+
+    ScreenSwitcher:
+        id: manager #Put an ID to your ScreenManager class

@@ -2,10 +2,19 @@
 name = "hms-kivy"
 version = "0.1.0"
 description = ""
-authors = ["dpslwk <dps.lwk@gmail.com>"]
+authors = ["Matt Lloyd <dps.lwk@gmail.com>"]
+repository = "https://github.com/NottingHack/hms-kivy"
+readme = "README.md"
+
+[tool.poetry.scripts]
+sendRfid = "hms_kivy.send_rfid:main"
+meeting = "hms_kivy.MeetingCheckIn:main"
+kiosk = "hms_kivy.Kiosk:main"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
+Kivy = "^2.0.0"
+pi-rc522 = { git = "https://github.com/kevinvalk/pi-rc522.git", markers = "python_version ~= '2.7' or platform_machine == 'armv7l'" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

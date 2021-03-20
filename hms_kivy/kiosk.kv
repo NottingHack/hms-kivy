@@ -1,0 +1,67 @@
+#:kivy 1.0
+
+#:set hsGreen (0.098, 0.349, 0.02, 0.9)
+#:set border (0, 0, 0, 1)
+
+<LogInScreen>:
+    name: 'login'
+
+    canvas:
+        Color:
+            rgba: hsGreen
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        Label:
+            id: message
+            text: 'Scan RFID to begin.'
+            font_size: (root.width**2 + root.height**2) / 11**4
+            pos_hint: {"center_x":0.5, "center_y":0.5}
+            size_hint: 0.09, 0.15
+        Label:
+            id: status
+            size_hint: 1, 0.15
+            text: root.statusMessage
+            font_size: '35sp'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+#KioskApp
+GridLayout:
+    rows: 2
+    size_hint: 1, 1
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(40)
+        pos_hint: {'top': 1, 'y': 0}
+        padding: 5,2,5,2
+        spacing: 5
+        Button:
+            id: logout
+            text: "Logout"
+            size_hint_x: 0.2
+            disabled: True
+            on_release:
+                app.logout()
+        Label:
+            id: title
+            text: ' '
+            font_size: '35sp'
+            text_size: self.size
+            size_hint_x: 0.55
+            halign: 'left'
+            valign: 'middle'
+        ClockLabel:
+            id: clock_label
+            size_hint: 0.25,1
+            font_size: '35sp'
+            text_size: self.size
+            valign: 'middle'
+            halign: 'right'
+
+    ScreenSwitcher:
+        id: manager #Put an ID to your ScreenManager class
+
