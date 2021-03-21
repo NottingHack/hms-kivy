@@ -1,0 +1,13 @@
+[Unit]
+Description=nh-kiosk: Kivy based Kiosk
+After=multi-user.target
+
+[Service]
+Type=idle
+WorkingDirectory=/home/pi/github/hms-kivy
+ExecStart=/home/pi/.local/bin/poetry run kiosk
+User=pi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
