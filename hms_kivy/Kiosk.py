@@ -107,8 +107,11 @@ class KioskApp(App):
         self.root.ids.title.text = text
 
     def open_settings_password(self):
+        self.setScreen("settingsPassword")
+
+    def setScreen(self, screen):
         self.previousScreen = self.root.ids.manager.current
-        self.root.ids.manager.current = "settingsPassword"
+        self.root.ids.manager.current = screen
 
     def restorePreviousScreen(self):
         previousScreen = self.root.ids.manager.current

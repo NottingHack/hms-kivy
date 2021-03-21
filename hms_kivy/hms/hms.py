@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ HMS Kiosk (HMS module)
-
-    Requirements (pi only)
-    pi-rc522 (https://github.com/kevinvalk/pi-rc522.git)
 
     Author: Matt Lloyd
     Copyright (c) 2020 Nottingham Hackspace

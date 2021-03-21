@@ -6,4 +6,4 @@ from hms_kivy.send_rfid import send_rfid
 
 
 def test_send_rfid():
-    assert send_rfid("12ed89a5".encode())
+    assert send_rfid("12ed89a5")

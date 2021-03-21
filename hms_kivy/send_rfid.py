@@ -43,11 +43,11 @@ def send_rfid(uid):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
     try:
-        sock.sendto(uid, ("<broadcast>", to_port))
+        sock.sendto(uid.encode(), ("<broadcast>", to_port))
     except socket.error as msg:
         if msg.errno == 49 or msg.errno == 101:
             try:
-                sock.sendto(uid, ("127.0.0.255", to_port))
+                sock.sendto(uid.encode(), ("127.0.0.255", to_port))
             except socket.error as msg:
                 print(
                     "Failed to send 127, Error code : {} Message: {}".format(
@@ -76,7 +76,7 @@ def main():
         print("You need to speficy a UID to send")
         sys.exit()
 
-    uid = sys.argv[1].encode()
+    uid = sys.argv[1]
     send_rfid(uid)
 
 

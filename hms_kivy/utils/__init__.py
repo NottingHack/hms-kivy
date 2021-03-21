@@ -1,3 +1,9 @@
+"""
+Utils
+===============
+load_kv borrowed from https://github.com/tshirtman/kivy-packaging-example
+"""
+
 from inspect import currentframe
 from os.path import exists
 
