@@ -51,7 +51,7 @@ from kivy.uix.settings import SettingsWithTabbedPanel
 from .hms import HMS
 from .rfid import RFID
 
-Logger.setLevel(LOG_LEVELS["debug"])
+# Logger.setLevel(LOG_LEVELS["debug"])
 
 
 class ScreenSwitcher(ScreenManager):
@@ -154,7 +154,7 @@ class SettingsPasswordScreen(Screen):
         self._app.updateTitle("")
 
     def on_confirm(self):
-        if self.password.text == self._app.config.get("Kiosk", "settingsPassword"):
+        if self.password.text == self._app.config.get("Kiosk", "settings_password"):
             self._app.open_settings()
             self.password.text = ""
             self._app.restorePreviousScreen()
@@ -165,7 +165,7 @@ class SettingsPasswordScreen(Screen):
 
 
 class KioskApp(App):
-    use_kivy_settings = False
+    # use_kivy_settings = False
     settings_cls = SettingsWithTabbedPanel
     userToken = None
     rfid = RFID()
@@ -173,7 +173,7 @@ class KioskApp(App):
     previousScreen = None
 
     def build_config(self, config):
-        config.setdefaults("Kiosk", {"settingsPassword": "1234"})
+        config.setdefaults("Kiosk", {"settings_password": "1234"})
         self.hms.build_config(config)
         self.rfid.build_config(config)
 
@@ -184,7 +184,7 @@ class KioskApp(App):
                     "type": "string",
                     "title": "Settings password",
                     "section": "Kiosk",
-                    "key": "settingsPassword",
+                    "key": "settings_password",
                 },
             ]
         )

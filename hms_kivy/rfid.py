@@ -72,8 +72,8 @@ class RFID:
         config.setdefaults(
             "RFID",
             {
-                "readTimeout": 10,
-                "listenPort": 7861,
+                "read_timeout": 10,
+                "listen_port": 7861,
                 "UDP_listen_timeout": 2,
             },
         )
@@ -86,14 +86,14 @@ class RFID:
                     "title": "Repeat Read Timeout",
                     "desc": "Timeout for how often the same RFID card will be reported.",
                     "section": "RFID",
-                    "key": "readTimeout",
+                    "key": "read_timeout",
                 },
                 {
                     "type": "numeric",
                     "title": "UDP Listen Port",
                     "desc": "UDP listen port, for fall-back.",
                     "section": "RFID",
-                    "key": "listenPort",
+                    "key": "listen_port",
                 },
                 {
                     "type": "numeric",

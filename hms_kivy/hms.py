@@ -46,8 +46,8 @@ class HMS:
             "HMS",
             {
                 "url": "https://lspace.nottinghack.org.uk",
-                "clientId": "",
-                "clientSecret": "",
+                "client_id": "",
+                "client_secret": "",
             },
         )
 
@@ -66,14 +66,14 @@ class HMS:
                     "title": "Client ID",
                     "desc": "Passport client credentials ID",
                     "section": "HMS",
-                    "key": "clientId",
+                    "key": "client_id",
                 },
                 {
                     "type": "string",
                     "title": "Client Secret",
                     "desc": "Passport client credentials secret",
                     "section": "HMS",
-                    "key": "clientSecret",
+                    "key": "client_secret",
                 },
             ]
         )
