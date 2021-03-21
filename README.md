@@ -76,4 +76,5 @@ to your VAGRANT file, updating the bridge: field as needed.
 Then `vagrant reload` to restart the box with new setting.
 Once the box is up, you can add its IP to the hosts file on the Pi
 
+https://github.com/Himura2la/rc522-serial
 https://github.com/DougieLawson/backlight_dimmer

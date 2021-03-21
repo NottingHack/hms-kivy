@@ -40,3 +40,41 @@ class HMS:
 
     def __init__(self):
         pass
+
+    def build_config(self, config):
+        config.setdefaults(
+            "HMS",
+            {
+                "url": "https://lspace.nottinghack.org.uk",
+                "clientId": "",
+                "clientSecret": "",
+            },
+        )
+
+    def build_settings(self, settings, config):
+        jsondata = json.dumps(
+            [
+                {
+                    "type": "string",
+                    "title": "URL",
+                    "desc": "URL to HMS, include the schema but no trailing slash",
+                    "section": "HMS",
+                    "key": "url",
+                },
+                {
+                    "type": "string",
+                    "title": "Client ID",
+                    "desc": "Passport client credentials ID",
+                    "section": "HMS",
+                    "key": "clientId",
+                },
+                {
+                    "type": "string",
+                    "title": "Client Secret",
+                    "desc": "Passport client credentials secret",
+                    "section": "HMS",
+                    "key": "clientSecret",
+                },
+            ]
+        )
+        settings.add_json_panel("HMS", config, data=jsondata)

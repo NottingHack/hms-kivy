@@ -68,6 +68,44 @@ class RFID:
                 )
             )
 
+    def build_config(self, config):
+        config.setdefaults(
+            "RFID",
+            {
+                "readTimeout": 10,
+                "listenPort": 7861,
+                "UDP_listen_timeout": 2,
+            },
+        )
+
+    def build_settings(self, settings, config):
+        jsondata = json.dumps(
+            [
+                {
+                    "type": "numeric",
+                    "title": "Repeat Read Timeout",
+                    "desc": "Timeout for how often the same RFID card will be reported.",
+                    "section": "RFID",
+                    "key": "readTimeout",
+                },
+                {
+                    "type": "numeric",
+                    "title": "UDP Listen Port",
+                    "desc": "UDP listen port, for fall-back.",
+                    "section": "RFID",
+                    "key": "listenPort",
+                },
+                {
+                    "type": "numeric",
+                    "title": "UDP Listen timeout",
+                    "desc": "UDP listen timeout, for fall-back.",
+                    "section": "RFID",
+                    "key": "UDP_listen_timeout",
+                },
+            ]
+        )
+        settings.add_json_panel("RFID", config, data=jsondata)
+
     def start_RFID_read(self):
         if self._reader:
             self.t_thread = threading.Thread(

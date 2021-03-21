@@ -39,14 +39,19 @@ import json
 
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.logger import Logger, LOG_LEVELS
 from kivy.network.urlrequest import UrlRequest
+from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.core.window import Window
-from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
+from kivy.uix.settings import SettingsWithTabbedPanel
 
 from .hms import HMS
 from .rfid import RFID
+
+Logger.setLevel(LOG_LEVELS["debug"])
 
 
 class ScreenSwitcher(ScreenManager):
@@ -54,10 +59,11 @@ class ScreenSwitcher(ScreenManager):
     def __init__(self, **kwargs):
         super(ScreenSwitcher, self).__init__(**kwargs)
         self.add_widget(LogInScreen())
+        self.add_widget(SettingsPasswordScreen())
 
 
 # TopBar Digital Clock
-class ClockLabel(Label):
+class ClockLabel(ButtonBehavior, Label):
     def __init__(self, **kwargs):
         super(ClockLabel, self).__init__(**kwargs)
         Clock.schedule_interval(self.update, 1)
@@ -114,36 +120,77 @@ class LogInScreen(Screen):
             # }
 
             # UrlRequest(
-            #     url         = self._meetingCheckInRfidURL.format(baseURL=self._baseURLProd if self.production else self._baseURLDev, meeting=self._meetinId),
-            #     req_body    = params,
-            #     req_headers = headers,
-            #     on_error    = self.checkInError,
-            #     on_failure  = self.checkInFailure,
-            #     on_progress = None,
-            #     on_redirect = self.checkInRedirect,
-            #     on_success  = self.checkInSuccess,
-            #     timeout     = 5,
-            #     verify      = self.production,
-            #     )
+            #     url=self._meetingCheckInRfidURL.format(
+            #         baseURL=self._baseURLProd if self.production else self._baseURLDev,
+            #         meeting=self._meetinId,
+            #     ),
+            #     req_body=params,
+            #     req_headers=headers,
+            #     on_error=self.checkInError,
+            #     on_failure=self.checkInFailure,
+            #     on_progress=None,
+            #     on_redirect=self.checkInRedirect,
+            #     on_success=self.checkInSuccess,
+            #     timeout=5,
+            #     verify=self.production,
+            # )
+
+
+class SettingsPasswordScreen(Screen):
+    statusMessage = StringProperty("")
+    password = ObjectProperty(None)
+
+    _app = None
+
+    def __init__(self, **kwargs):
+        super(SettingsPasswordScreen, self).__init__(**kwargs)
+
+    def on_enter(self):
+        self.statusMessage = ""
+        self._app = App.get_running_app()
+        self._app.updateTitle("Settings Locked")
+
+    def on_leave(self):
+        self._app.updateTitle("")
+
+    def on_confirm(self):
+        if self.password.text == self._app.config.get("Kiosk", "settingsPassword"):
+            self._app.open_settings()
+            self.password.text = ""
+            self._app.restorePreviousScreen()
+
+    def on_cancel(self):
+        self.password.text = ""
+        self._app.restorePreviousScreen()
 
 
 class KioskApp(App):
+    use_kivy_settings = False
+    settings_cls = SettingsWithTabbedPanel
     userToken = None
     rfid = RFID()
+    hms = HMS()
+    previousScreen = None
 
     def build_config(self, config):
-        config.setdefaults(
-            "HMS",
-            {
-                "url": "https://lspace.nottinghack.org.uk",
-                "clientId": "9",
-                "clientSecret": "ctYIiYVX1oIVrOSXroPn2jRIkxCb4FsMEVpjoVYb",
-            },
-        )
+        config.setdefaults("Kiosk", {"settingsPassword": "1234"})
+        self.hms.build_config(config)
+        self.rfid.build_config(config)
 
     def build_settings(self, settings):
-        jsondata = """... put the json data here ..."""
-        settings.add_json_panel("Test application", self.config, data=jsondata)
+        jsondata = json.dumps(
+            [
+                {
+                    "type": "string",
+                    "title": "Settings password",
+                    "section": "Kiosk",
+                    "key": "settingsPassword",
+                },
+            ]
+        )
+        settings.add_json_panel("Kiosk", self.config, data=jsondata)
+        self.hms.build_settings(settings, self.config)
+        self.rfid.build_settings(settings, self.config)
 
     def on_config_change(self, config, section, key, value):
         pass
@@ -157,13 +204,22 @@ class KioskApp(App):
     def updateTitle(self, text=""):
         self.root.ids.title.text = text
 
+    def open_settings_password(self):
+        self.previousScreen = self.root.ids.manager.current
+        self.root.ids.manager.current = "settingsPassword"
+
+    def restorePreviousScreen(self):
+        previousScreen = self.root.ids.manager.current
+        self.root.ids.manager.current = self.previousScreen
+        self.previousScreen = previousScreen
+
     def login(self, userToken):
-        print("login")
+        Logger.debug("login")
         self.root.ids.logout.disabled = False
         self.userToken = userToken
 
     def logout(self):
-        print("logout")
+        Logger.debug("logout")
         self.root.ids.logout.disabled = True
         self.userToken = None
         self.updateTitle()
