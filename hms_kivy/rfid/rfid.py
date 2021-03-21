@@ -145,7 +145,7 @@ class RFID:
 
             uid = self._reader.read_id()
             if uid is not None:
-                uid_number = hexlify(bytearray(uid))
+                uid_number = hexlify(bytearray(uid)).decode("utf-8")
                 if last_uid != uid_number:
                     last_uid = uid_number
                     try:

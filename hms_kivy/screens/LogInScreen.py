@@ -75,11 +75,13 @@ class LogInScreen(Screen):
             # get/refresh clientToken first
             self.statusMessage = "Checking Card"
             self._app.login([])
-            params = json.dumps(
-                {
-                    "rfidSerial": uid,
-                }
-            )
+            Logger.debug(uid)
+
+            # params = json.dumps(
+            #     {
+            #         "rfidSerial": uid,
+            #     }
+            # )
 
             # headers = {
             #     "Content-type": "application/json",
