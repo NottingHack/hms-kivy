@@ -42,7 +42,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.settings import SettingsWithTabbedPanel
 
 from .hms import HMS
-from .rfid import RFID
+from .rfid.rfid import RFID
 from .screens import SettingsPasswordScreen, LogInScreen
 
 Logger.setLevel(LOG_LEVELS["debug"])

@@ -4,4 +4,4 @@ RFID
 
 """
 
-from .rfid import RFID
+# from .rfid import RFID

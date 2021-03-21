@@ -28,6 +28,7 @@ Form here you can access run one of the apps
 
     meeting
     kiosk
+    rfid
     sendRfid
 
 Or they can be run outside the env like so

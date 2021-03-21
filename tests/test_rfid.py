@@ -1,6 +1,6 @@
 import pytest
 
-from hms_kivy.rfid import RFID
+from hms_kivy.rfid.rfid import RFID
 
 
 class TestRfidClass:

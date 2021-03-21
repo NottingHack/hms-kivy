@@ -26,8 +26,6 @@
   SOFTWARE.
 """
 import sys
-from time import time, sleep
-import os
 import socket
 import json
 

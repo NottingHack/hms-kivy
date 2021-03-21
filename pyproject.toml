@@ -7,14 +7,16 @@ repository = "https://github.com/NottingHack/hms-kivy"
 readme = "README.md"
 
 [tool.poetry.scripts]
-sendRfid = "hms_kivy.send_rfid:main"
 meeting = "hms_kivy.MeetingCheckIn:main"
 kiosk = "hms_kivy.Kiosk:main"
+sendRfid = "hms_kivy.send_rfid:main"
+rfid = "hms_kivy.rfid.cli:app"
 
 [tool.poetry.dependencies]
 python = "^3.7"
 Kivy = {extras = ["base"], version = "^2.0.0"}
 pi-rc522 = { git = "https://github.com/kevinvalk/pi-rc522.git", markers = "platform_machine == 'armv7l'" }
+typer = {extras = ["all"], version = "^0.3.2"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
