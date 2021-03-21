@@ -13,7 +13,7 @@ kiosk = "hms_kivy.Kiosk:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Kivy = "^2.0.0"
+Kivy = {extras = ["base"], version = "^2.0.0"}
 pi-rc522 = { git = "https://github.com/kevinvalk/pi-rc522.git", markers = "platform_machine == 'armv7l'" }
 
 [tool.poetry.dev-dependencies]

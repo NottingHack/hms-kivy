@@ -10,6 +10,10 @@ These have been designed to run on a Raspberry Pi with an official 7" touch scre
 
 This project is using [Poetry](https://python-poetry.org/) to manage the dependencies  
 These boil down to Python3, Kivy and [pi-rc522](https://github.com/kevinvalk/pi-rc522.git)  
+
+Note on Raspberry Pi need to install kivy source deps first https://kivy.org/doc/stable/installation/installation-rpi.html#install-source-rpi
+
+
 Once you have installed Poetry 
 
 Inside the cloned repository you can now use poetry to setup the virtual environment and install all the dependencies
@@ -24,6 +28,7 @@ Form here you can access run one of the apps
 
     meeting
     kiosk
+    sendRfid
 
 Or they can be run outside the env like so
 
