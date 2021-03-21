@@ -174,7 +174,7 @@ class RFID:
             return
 
         UDP_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        UDP_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        UDP_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         try:
             UDP_listen_socket.bind(("", self._config.getint("RFID", "listen_port")))
@@ -193,7 +193,7 @@ class RFID:
                 self._config.getint("RFID", "UDP_listen_timeout"),
             )
             if datawaiting[0]:
-                (uid_number, address) = UDP_listen_socket.recvfrom(8192)
+                (uid_number, address) = UDP_listen_socket.recvfrom(1024)
                 Logger.debug(
                     "tUDPListen: Received: {} From: {}".format(uid_number, address)
                 )

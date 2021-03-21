@@ -77,43 +77,23 @@ def remove():
 def send_packet(json_packet):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Internet  # UDP
 
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    if sys.platform == "darwin":
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
     try:
-
-        sock.sendto(json_packet.encode(), ("<broadcast>", state["port"]))
+        sock.sendto(json_packet.encode(), ("localhost", state["port"]))
     except socket.error as msg:
-        if msg.errno == 49 or msg.errno == 101:
-            try:
+        typer.secho(
+            f"Failed to send via localhost, Error code : {msg.errno} Message: {msg.strerror}",
+            err=True,
+            fg=typer.colors.WHITE,
+            bg=typer.colors.RED,
+        )
+        sock.close()
 
-                sock.sendto(json_packet.encode(), ("127.0.0.255", state["port"]))
-            except socket.error as msg:
-                typer.secho(
-                    f"Failed to send via 127, Error code : {msg.errno} Message: {msg.strerror}",
-                    err=True,
-                    fg=typer.colors.WHITE,
-                    bg=typer.colors.RED,
-                )
-                sock.close()
-
-                return False
-            else:
-                typer.secho("Sent via 127", fg=typer.colors.GREEN)
-        else:
-            typer.secho(
-                f"Failed to send via broadcast, Error code : {msg.errno} Message: {msg.strerror}",
-                err=True,
-                fg=typer.colors.WHITE,
-                bg=typer.colors.RED,
-            )
-            sock.close()
-
-            return False
+        return False
     else:
-        typer.secho("Sent via broadcast", fg=typer.colors.GREEN)
+        typer.secho("Sent via localhost", fg=typer.colors.GREEN)
 
     sock.close()
 
