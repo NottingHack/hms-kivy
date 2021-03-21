@@ -1,0 +1,29 @@
+#:kivy 1.0
+
+#:set hsGreen (0.098, 0.349, 0.02, 0.9)
+#:set border (0, 0, 0, 1)
+
+<LogInScreen>:
+    name: 'login'
+
+    canvas:
+        Color:
+            rgba: hsGreen
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        Label:
+            id: message
+            text: 'Insert RFID to begin.'
+            font_size: (root.width**2 + root.height**2) / 11**4
+            pos_hint: {"center_x":0.5, "center_y":0.5}
+            size_hint: 0.09, 0.15
+        Label:
+            id: status
+            size_hint: 1, 0.15
+            text: root.statusMessage
+            font_size: '35sp'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'

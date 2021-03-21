@@ -30,7 +30,11 @@
 """
 import json
 import urllib.request, urllib.parse, urllib.error
+
+from kivy.app import App
 from kivy.config import Config
+from kivy.logger import Logger
+from kivy.network.urlrequest import UrlRequest
 
 
 class HMS:
