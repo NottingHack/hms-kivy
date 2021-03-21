@@ -45,22 +45,27 @@ class SettingsPasswordScreen(Screen):
         super(SettingsPasswordScreen, self).__init__(**kwargs)
 
     def on_enter(self):
+        Logger.debug("SettingsPasswordScreen@on_enter")
         self.statusMessage = ""
         self._app = App.get_running_app()
         self._app.updateTitle("Settings Locked")
 
     def on_leave(self):
+        Logger.debug("SettingsPasswordScreen@on_leave")
         self._app.updateTitle("")
 
     def on_confirm(self):
-        Logger.info(self.password.text)
-        Logger.info(self._app.config.get("Kiosk", "settings_password"))
+        Logger.debug("SettingsPasswordScreen@on_confirm")
         if self.password.text == self._app.config.get("Kiosk", "settings_password"):
             self._app.open_settings()
             self.password.text = ""
             self._app.restorePreviousScreen()
+        else:
+            # TODO: flash the screen
+            Logger.debug("SettingsPasswordScreen@on_confirm: password miss")
 
     def on_cancel(self):
+        Logger.debug("SettingsPasswordScreen@on_cancel")
         self.password.text = ""
         self._app.restorePreviousScreen()
 

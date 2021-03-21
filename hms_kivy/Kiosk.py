@@ -95,7 +95,8 @@ class KioskApp(App):
         self.rfid.build_settings(settings, self.config)
 
     def on_config_change(self, config, section, key, value):
-        pass
+        self.hms.on_config_change(config, section, key, value)
+        self.rfid.on_config_change(config, section, key, value)
 
     def on_start(self, *args):
         pass

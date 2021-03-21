@@ -42,6 +42,7 @@ class HMS:
         pass
 
     def build_config(self, config):
+        Logger.debug("HMS@build_config")
         config.setdefaults(
             "HMS",
             {
@@ -52,6 +53,7 @@ class HMS:
         )
 
     def build_settings(self, settings, config):
+        Logger.debug("HMS@build_settings")
         jsondata = json.dumps(
             [
                 {
@@ -78,3 +80,6 @@ class HMS:
             ]
         )
         settings.add_json_panel("HMS", config, data=jsondata)
+
+    def on_config_change(self, config, section, key, value):
+        Logger.debug("HMS@on_config_change")

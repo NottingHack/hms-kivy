@@ -57,17 +57,16 @@ class CheckInScreen(Screen):
         # hms.checkInScreen = self
 
     def on_enter(self):
+        Logger.debug("CheckInScreen@on_enter")
         self._app = App.get_running_app()
         self._app.updateTitle("Finding Next Meeting")
 
     def on_leave(self):
-        pass
-        # hms.stopRFID()
-
-    def updateTitle(self, title):
-        self._app.updateTitle(title)
+        Logger.debug("CheckInScreen@on_leave")
 
     def updateCheckInCounts(self, counts):
+        Logger.debug("CheckInScreen@updateCheckInCounts")
+
         self.checkInScreen.currentMembers = str(counts["currentMembers"])
         self.checkInScreen.votingMembers = str(counts["votingMembers"])
         self.checkInScreen.quorum = str(counts["quorum"])

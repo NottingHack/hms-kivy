@@ -48,22 +48,25 @@ class LogInScreen(Screen):
         super(LogInScreen, self).__init__(**kwargs)
 
     def on_enter(self):
+        Logger.debug("LogInScreen@on_enter")
         self.statusMessage = ""
         self._app = App.get_running_app()
         # start checking RFID's
         self._app.rfid.start_RFID_read()
-        self.eventCheckRFID = Clock.schedule_interval(self.checkForRFID, 0.5)
+        self.event_check_RFID = Clock.schedule_interval(self.check_for_RFID, 0.5)
 
     def on_leave(self):
+        Logger.debug("LogInScreen@on_leave")
         self.statusMessage = ""
         # start checking RFID's
         self._app.rfid.stop_RFID_read()
         try:
-            self.eventCheckRFID.cancel()
+            self.event_check_RFID.cancel()
         except:
             pass
 
-    def checkForRFID(self, *args):
+    def check_for_RFID(self, *args):
+        # Logger.debug("LogInScreen@check_for_RFID")
         try:
             uid = self._app.rfid.q_RFID.get_nowait()
         except queue.Empty:

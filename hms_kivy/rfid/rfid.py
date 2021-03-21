@@ -41,9 +41,7 @@ from kivy.logger import Logger
 
 class RFID:
     _reader = False
-    _listenPort = 7861
-    _UDP_listen_timeout = 2  # timeout for UDP listen
-    _readTimeout = 10  # allow read of same card after 10 seconds
+    _config = None
 
     def __init__(self):
         self.t_RFID_stop = threading.Event()
@@ -55,19 +53,13 @@ class RFID:
             self._reader = pirc522.RFID(pin_irq=None, antenna_gain=7)
             Logger.debug("RFID: using pirc522")
         except ImportError:
-            Logger.debug(
-                "RFID: Error importing pirc522. Will listen for UDP on {}".format(
-                    self._listenPort
-                )
-            )
+            Logger.debug("RFID: Error importing pirc522. Will listen for UDP")
         except:
-            Logger.debug(
-                "RFID: Error importing pirc522 Will listen for UDP on {}".format(
-                    self._listenPort
-                )
-            )
+            Logger.debug("RFID: Error importing pirc522 Will listen for UDP")
 
     def build_config(self, config):
+        self._config = config
+        Logger.debug("RFID@build_config")
         config.setdefaults(
             "RFID",
             {
@@ -77,7 +69,11 @@ class RFID:
             },
         )
 
+    def on_config_change(self, config, section, key, value):
+        Logger.debug("RFID@on_config_change")
+
     def build_settings(self, settings, config):
+        Logger.debug("RFID@build_settings")
         jsondata = json.dumps(
             [
                 {
@@ -106,6 +102,7 @@ class RFID:
         settings.add_json_panel("RFID", config, data=jsondata)
 
     def start_RFID_read(self):
+        Logger.debug("RFID@start_RFID_read")
         if self._reader:
             self.t_thread = threading.Thread(
                 name="tRC522read", target=self._rc522_thread
@@ -116,13 +113,18 @@ class RFID:
         try:
             self.t_thread.start()
         except:
-            Logger.debug("RFID: Failed to start thread: {}".format(self.t_thread.name))
+            Logger.exception(
+                "RFID@start_RFID_read: Failed to start thread: {}".format(
+                    self.t_thread.name
+                )
+            )
 
     def stop_RFID_read(self):
-        Logger.debug("RFID: Stopping thread")
+        Logger.debug("RFID@stop_RFID_read: Stopping thread")
         self.t_RFID_stop.set()
 
     def clear_queue(self):
+        Logger.debug("RFID@clear_queue")
         with self.q_RFID.mutex:
             self.q_RFID.queue.clear()
 
@@ -135,7 +137,9 @@ class RFID:
         last_read_time = 0
         while not self.t_RFID_stop.is_set():
             # clear last read if it was a while ago
-            if ((time.time() - last_read_time)) > self._readTimeout:
+            if ((time.time() - last_read_time)) > self._config.getint(
+                "RFID", "readTimeout"
+            ):
                 last_read_time = time.time()
                 last_uid = None
 
@@ -173,7 +177,7 @@ class RFID:
         UDP_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         try:
-            UDP_listen_socket.bind(("", self._listenPort))
+            UDP_listen_socket.bind(("", self._config.getint("RFID", "listen_port")))
         except socket.error:
             Logger.debug("tUDPListen: Failed to bind port, Exiting")
             return
@@ -183,7 +187,10 @@ class RFID:
         Logger.debug("tUDPListen: listening")
         while not self.t_RFID_stop.is_set():
             datawaiting = select.select(
-                [UDP_listen_socket], [], [], self._UDP_listen_timeout
+                [UDP_listen_socket],
+                [],
+                [],
+                self._config.getint("RFID", "UDP_listen_timeout"),
             )
             if datawaiting[0]:
                 (uid_number, address) = UDP_listen_socket.recvfrom(8192)
@@ -192,7 +199,9 @@ class RFID:
                 )
 
                 # clear last read if it was a while ago
-                if (time.time() - last_read_time) > self._readTimeout:
+                if (time.time() - last_read_time) > self._config.getint(
+                    "RFID", "readTimeout"
+                ):
                     last_read_time = time.time()
                     last_uid = None
 
