@@ -77,7 +77,7 @@ class LogInScreen(Screen):
             self._app.login([])
             params = json.dumps(
                 {
-                    "rfidSerial": uid.decode("utf-8"),
+                    "rfidSerial": uid,
                 }
             )
 

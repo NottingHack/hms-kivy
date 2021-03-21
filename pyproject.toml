@@ -9,7 +9,6 @@ readme = "README.md"
 [tool.poetry.scripts]
 meeting = "hms_kivy.MeetingCheckIn:main"
 kiosk = "hms_kivy.Kiosk:main"
-sendRfid = "hms_kivy.send_rfid:main"
 rfid = "hms_kivy.rfid.cli:app"
 
 [tool.poetry.dependencies]

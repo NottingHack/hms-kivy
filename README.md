@@ -29,7 +29,6 @@ Form here you can access run one of the apps
     meeting
     kiosk
     rfid
-    sendRfid
 
 Or they can be run outside the env like so
 
@@ -42,7 +41,7 @@ Test can be run inside or outside the poetry shell with
     poetry run pytest
 
 
-## Using Official RPi touch display
+### Using Official RPi touch display
 
 If you are using the official Raspberry Pi touch display, you need to configure Kivy to use it as an input source. To do this, edit the file ~/.kivy/config.ini and go to the [input] section. Add this:
 
@@ -52,25 +51,35 @@ If you are using the official Raspberry Pi touch display, you need to configure 
     hid_%(name)s = probesysfs,provider=hidinput
 
 
+Also recommend setting the keyboard mode in the [kivy]
 
-# **OUT OF DATE**
-## Requirements
-Kivy Pi OS install
- http://kivypie.mitako.eu
+    keyboard_mode = systemanddock
 
-pi-rc522 python library
- https://github.com/kevinvalk/pi-rc522.git
 
-## Client Credentials
-Client Credentials can be generated with
-```
-php artisan passport:client --client
-```
+### Client Credentials
+With in HMS you need to generate a Client Credentials with the following command
 
-## Testing not on a pi
-This will run on any device with kivy installed, when pi-rc522 library is not available it will listen for UDP broadcast on port 7861 for RFID string packets
+    php artisan passport:client --client
 
-There is a quick script `sendRfid.py` which takes a rfid serial as a command line arg and will broadcast it onto the network
+The details of which can then be entered into the setting panel/file
+
+## Apps
+
+### kiosk
+
+The main Kiosk app for use with in the space
+
+### meeting
+
+This is the original AGM Meeting check in from hms-meeting
+
+### rfid
+
+This is a cli helper for presenting RFID tags over UDP, its used in development when not running on a Pi where pi-rc522 is available
+
+commands are `present` or `remove`  
+`present` requires a RFID UID parameter
+
 
 ## Testing on a pi
 If you need to expose the HMS dev vagrant to you public network add
@@ -82,5 +91,7 @@ to your VAGRANT file, updating the bridge: field as needed.
 Then `vagrant reload` to restart the box with new setting.
 Once the box is up, you can add its IP to the hosts file on the Pi
 
+
+#### Notes / TODO
 https://github.com/Himura2la/rc522-serial
 https://github.com/DougieLawson/backlight_dimmer

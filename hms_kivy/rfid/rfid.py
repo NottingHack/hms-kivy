@@ -138,7 +138,7 @@ class RFID:
         while not self.t_RFID_stop.is_set():
             # clear last read if it was a while ago
             if ((time.time() - last_read_time)) > self._config.getint(
-                "RFID", "readTimeout"
+                "RFID", "read_timeout"
             ):
                 last_read_time = time.time()
                 last_uid = None
@@ -166,6 +166,7 @@ class RFID:
         """
         Logger.debug("tUDPListen: Thread started")
         last_uid = None
+        last_read_time = 0
 
         try:
             UDP_listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -193,14 +194,14 @@ class RFID:
                 self._config.getint("RFID", "UDP_listen_timeout"),
             )
             if datawaiting[0]:
-                (uid_number, address) = UDP_listen_socket.recvfrom(1024)
-                Logger.debug(
-                    "tUDPListen: Received: {} From: {}".format(uid_number, address)
-                )
+                (data, address) = UDP_listen_socket.recvfrom(1024)
+                Logger.debug("tUDPListen: Received: {} From: {}".format(data, address))
+
+                uid_number = json.loads(data)["uid"]
 
                 # clear last read if it was a while ago
                 if (time.time() - last_read_time) > self._config.getint(
-                    "RFID", "readTimeout"
+                    "RFID", "read_timeout"
                 ):
                     last_read_time = time.time()
                     last_uid = None
