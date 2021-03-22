@@ -47,7 +47,7 @@ from kivy.uix.settings import SettingsWithTabbedPanel
 
 from .hms import HMS
 from .rfid.rfid import RFID
-from .screens import SettingsPasswordScreen, LogInScreen
+from .screens import SettingsPasswordScreen, LogInScreen, HomeScreen
 
 
 class ScreenSwitcher(ScreenManager):
@@ -56,6 +56,7 @@ class ScreenSwitcher(ScreenManager):
         super(ScreenSwitcher, self).__init__(**kwargs)
         self.add_widget(LogInScreen())
         self.add_widget(SettingsPasswordScreen())
+        self.add_widget(HomeScreen())
 
 
 # TopBar Digital Clock
