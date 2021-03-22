@@ -52,7 +52,7 @@ class SettingsPasswordScreen(Screen):
 
     def on_leave(self):
         Logger.debug("SettingsPasswordScreen: on_leave")
-        self._app.update_title("")
+        # self._app.update_title("")
 
     def on_confirm(self):
         Logger.debug("SettingsPasswordScreen: on_confirm")
