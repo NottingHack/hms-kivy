@@ -27,11 +27,7 @@
 
 __all__ = ("LogInScreen",)
 
-import queue
-import json
-
 from kivy.app import App
-from kivy.clock import Clock
 from kivy.logger import Logger
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
@@ -54,11 +50,22 @@ class LogInScreen(Screen):
         # self._app.rfid.bind("on_present")
         self._app.update_title()
         self._app.enable_login()
+        self._app.rfid.bind(on_present=self.on_rfid_present)
+        self._app.rfid.bind(on_remove=self.on_rfid_remove)
 
     def on_leave(self):
         Logger.debug("LogInScreen: on_leave")
         self.status_message = ""
-        self._app.disable_login()
+        self._app.disable_login()  #  not sure about this one yet might leave it enabled
+        self._app.rfid.unbind(on_present=self.on_rfid_present)
+        self._app.rfid.unbind(on_remove=self.on_rfid_remove)
+
+    def on_rfid_present(self, obj, uid):
+        Logger.debug(f"Kiosk: on_rfid_present: {uid}")
+        self.status_message = "Attempting Login"
+
+    def on_rfid_remove(self, *args):
+        self.status_message = ""
 
 
 load_kv()

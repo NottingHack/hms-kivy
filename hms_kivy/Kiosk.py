@@ -72,7 +72,7 @@ class ClockLabel(ButtonBehavior, Label):
 class KioskApp(App):
     # use_kivy_settings = False
     settings_cls = SettingsWithTabbedPanel
-    userToken = None
+    user = None
     rfid = RFID()
     hms = HMS()
     previous_screen = None
@@ -105,6 +105,9 @@ class KioskApp(App):
         self.rfid.start_RFID_read()
         self.rfid.bind(on_remove=self.logout)
 
+        # done in LogInScreen for now
+        # self._app.enable_login()
+
     def on_stop(self, *args):
         self.rfid.stop_RFID_read()
 
@@ -126,23 +129,45 @@ class KioskApp(App):
 
     def enable_login(self):
         Logger.debug("Kiosk: enable_login")
-        self.rfid.bind(on_present=self.login)
+        self.rfid.bind(on_present=self.on_rfid_present)
 
     def disable_login(self):
         Logger.debug("Kiosk: disable_login")
-        self.rfid.unbind(on_present=self.login)
+        self.rfid.unbind(on_present=self.on_rfid_present)
 
-    def login(self, obj, uid):
-        Logger.debug(f"Kiosk: login: {uid}")
+    def on_rfid_present(self, obj, uid):
+        Logger.debug(f"Kiosk: on_rfid_present: {uid}")
+
+        if self.user is not None:
+            # we have a user already logged in and now have a new one?
+            # should not get here anyway
+            self.logout
+
+        if self.root.ids.manager.current != "login":
+            self.set_screen("login")
+
+        self.hms.login(uid, on_success=self.login_success, on_fail=self.login_failed)
+
+    def login_success(self, user, permissions):
+        Logger.debug(f"Kiosk: login_success: {user['name']}")
+        self.user = user
+        self.permissions = permissions
 
         self.root.ids.logout.disabled = False
+        # move to the next screen
+        self.set_screen("home")
 
-        self.hms.login
+    def login_failed(self, reason):
+        Logger.debug(f"Kiosk: login_failed: {reason}")
+        #  login failed for some reason need to flash on the login screen
+        self.root.ids.manager.get_screen("login").status_message = reason
 
     def logout(self, *args, **kwargs):
         Logger.debug("Kiosk: logout")
         if self.root.ids.manager.current == "checkIn":
             return
+        self.user = None
+        self.permissions = None
         self.root.ids.logout.disabled = True
         self.update_title()
         # bypass normal set_screen logic
