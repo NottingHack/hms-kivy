@@ -28,6 +28,7 @@ import json
 import urllib.request, urllib.parse, urllib.error
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.config import Config
 from kivy.logger import Logger
 from kivy.network.urlrequest import UrlRequest
@@ -85,3 +86,10 @@ class HMS:
 
     def on_config_change(self, config, section, key, value):
         Logger.debug("HMS: on_config_change")
+
+    def login(self, uid, on_success, on_fail):
+        """Login into HMS using a given RFIDTag UID"""
+        Logger.debug(f"HMS: login: {uid}")
+
+        Clock.schedule_once(lambda dt: on_success({"name": "Matt"}, {}), 2)
+        # Clock.schedule_once(lambda dt: on_fail("Do'h"), 2)
