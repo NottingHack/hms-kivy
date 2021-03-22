@@ -27,7 +27,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 """
-import time
+from time import time
 import queue
 import threading
 import socket
@@ -71,7 +71,7 @@ class RFID(EventDispatcher):
         config.setdefaults(
             "RFID",
             {
-                "read_timeout": 10,
+                "read_timeout": 5,
                 "listen_port": 7861,
                 "UDP_listen_timeout": 2,
             },
@@ -83,8 +83,8 @@ class RFID(EventDispatcher):
             [
                 {
                     "type": "numeric",
-                    "title": "Repeat Read Timeout",
-                    "desc": "Timeout for how often the same RFID card will be reported.",
+                    "title": "Read Timeout",
+                    "desc": "How long after a card is removed before Logout is pass to app",
                     "section": "RFID",
                     "key": "read_timeout",
                 },
@@ -175,17 +175,11 @@ class RFID(EventDispatcher):
         """
         Logger.debug("tRC522read: Thread started")
         last_uid = None
-        last_read_time = 0
+        last_read_time = time()
         while not self.t_RFID_stop.is_set():
-            # clear last read if it was a while ago
-            if ((time.time() - last_read_time)) > self._config.getint(
-                "RFID", "read_timeout"
-            ):
-                last_read_time = time.time()
-                last_uid = None
-
             uid = self._reader.read_id()
             if uid is not None:
+                last_read_time = time()
                 uid_number = hexlify(bytearray(uid)).decode("utf-8")
                 if last_uid != uid_number:
                     last_uid = uid_number
@@ -194,6 +188,20 @@ class RFID(EventDispatcher):
                     except queue.Full:
                         Logger.debug(
                             f"tRC522read: Failed to put {uid_number} on q_RFID as it's full"
+                        )
+            else:
+                # could not read a card
+                # clear last read if it was a while ago
+                if ((time.time() - last_read_time)) > self._config.getint(
+                    "RFID", "read_timeout"
+                ):
+                    last_read_time = time()
+                    last_uid = None
+                    try:
+                        self.q_RFID.put_nowait(None)
+                    except queue.Full:
+                        Logger.debug(
+                            f"tRC522read: Failed to put REMOVE on q_RFID as it's full"
                         )
 
             self.t_RFID_stop.wait(0.5)
