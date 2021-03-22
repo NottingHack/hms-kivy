@@ -68,7 +68,7 @@ def remove():
     Remove the RFID card from the reader
     """
     typer.echo("Removing RFID")
-    packet = {"uid": ""}
+    packet = {"uid": None}
 
     if not send_packet(json.dumps(packet)):
         raise typer.Exit()

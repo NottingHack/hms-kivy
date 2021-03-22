@@ -40,7 +40,7 @@ from ..utils import load_kv
 
 
 class LogInScreen(Screen):
-    statusMessage = StringProperty("")
+    status_message = StringProperty("")
 
     _app = None
 
@@ -48,64 +48,17 @@ class LogInScreen(Screen):
         super(LogInScreen, self).__init__(**kwargs)
 
     def on_enter(self):
-        Logger.debug("LogInScreen@on_enter")
-        self.statusMessage = ""
+        Logger.debug("LogInScreen: on_enter")
+        self.status_message = ""
         self._app = App.get_running_app()
-        # start checking RFID's
-        self._app.rfid.start_RFID_read()
-        self.event_check_RFID = Clock.schedule_interval(self.check_for_RFID, 0.5)
+        # self._app.rfid.bind("on_present")
+        self._app.update_title()
+        self._app.enable_login()
 
     def on_leave(self):
-        Logger.debug("LogInScreen@on_leave")
-        self.statusMessage = ""
-        # start checking RFID's
-        self._app.rfid.stop_RFID_read()
-        try:
-            self.event_check_RFID.cancel()
-        except:
-            pass
-
-    def check_for_RFID(self, *args):
-        # Logger.debug("LogInScreen@check_for_RFID")
-        try:
-            uid = self._app.rfid.q_RFID.get_nowait()
-        except queue.Empty:
-            pass
-        else:
-            # get/refresh clientToken first
-            self.statusMessage = "Checking Card"
-            self._app.login([])
-            Logger.debug(uid)
-
-            # params = json.dumps(
-            #     {
-            #         "rfidSerial": uid,
-            #     }
-            # )
-
-            # headers = {
-            #     "Content-type": "application/json",
-            #     "Accept": "application/json",
-            #     "Authorization": "{} {}".format(
-            #         self._token["token_type"], self._token["access_token"]
-            #     ),
-            # }
-
-            # UrlRequest(
-            #     url=self._meetingCheckInRfidURL.format(
-            #         baseURL=self._baseURLProd if self.production else self._baseURLDev,
-            #         meeting=self._meetinId,
-            #     ),
-            #     req_body=params,
-            #     req_headers=headers,
-            #     on_error=self.checkInError,
-            #     on_failure=self.checkInFailure,
-            #     on_progress=None,
-            #     on_redirect=self.checkInRedirect,
-            #     on_success=self.checkInSuccess,
-            #     timeout=5,
-            #     verify=self.production,
-            # )
+        Logger.debug("LogInScreen: on_leave")
+        self.status_message = ""
+        self._app.disable_login()
 
 
 load_kv()

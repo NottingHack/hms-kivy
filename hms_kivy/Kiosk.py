@@ -31,11 +31,15 @@
 import time
 import queue
 import json
+import os
+
+from kivy.logger import Logger, LOG_LEVELS
+
+Logger.setLevel(LOG_LEVELS["debug"])
 
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.logger import Logger, LOG_LEVELS
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager
@@ -44,8 +48,6 @@ from kivy.uix.settings import SettingsWithTabbedPanel
 from .hms import HMS
 from .rfid.rfid import RFID
 from .screens import SettingsPasswordScreen, LogInScreen
-
-Logger.setLevel(LOG_LEVELS["debug"])
 
 
 class ScreenSwitcher(ScreenManager):
@@ -72,7 +74,7 @@ class KioskApp(App):
     userToken = None
     rfid = RFID()
     hms = HMS()
-    previousScreen = None
+    previous_screen = None
 
     def build_config(self, config):
         config.setdefaults("Kiosk", {"settings_password": "1234"})
@@ -99,36 +101,51 @@ class KioskApp(App):
         self.rfid.on_config_change(config, section, key, value)
 
     def on_start(self, *args):
-        pass
+        self.rfid.start_RFID_read()
+        self.rfid.bind(on_remove=self.logout)
 
     def on_stop(self, *args):
         self.rfid.stop_RFID_read()
 
-    def updateTitle(self, text=""):
-        self.root.ids.title.text = text
+    def update_title(self, text=""):
+        if self.root:
+            self.root.ids.title.text = text
 
     def open_settings_password(self):
-        self.setScreen("settingsPassword")
+        self.set_screen("settingsPassword")
 
-    def setScreen(self, screen):
-        self.previousScreen = self.root.ids.manager.current
+    def set_screen(self, screen):
+        self.previous_screen = self.root.ids.manager.current
         self.root.ids.manager.current = screen
 
-    def restorePreviousScreen(self):
-        previousScreen = self.root.ids.manager.current
-        self.root.ids.manager.current = self.previousScreen
-        self.previousScreen = previousScreen
+    def restore_previous_screen(self):
+        previous_screen = self.root.ids.manager.current
+        self.root.ids.manager.current = self.previous_screen
+        self.previous_screen = previous_screen
 
-    def login(self, userToken):
-        Logger.debug("login")
+    def enable_login(self):
+        Logger.debug("Kiosk: enable_login")
+        self.rfid.bind(on_present=self.login)
+
+    def disable_login(self):
+        Logger.debug("Kiosk: disable_login")
+        self.rfid.unbind(on_present=self.login)
+
+    def login(self, obj, uid):
+        Logger.debug(f"Kiosk: login: {uid}")
+
         self.root.ids.logout.disabled = False
-        self.userToken = userToken
 
-    def logout(self):
-        Logger.debug("logout")
+        self.hms.login
+
+    def logout(self, *args, **kwargs):
+        Logger.debug("Kiosk: logout")
+        if self.root.ids.manager.current == "checkIn":
+            return
         self.root.ids.logout.disabled = True
-        self.userToken = None
-        self.updateTitle()
+        self.update_title()
+        # bypass normal set_screen logic
+        self.previous_screen = "login"
         self.root.ids.manager.current = "login"
 
 

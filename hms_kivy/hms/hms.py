@@ -34,15 +34,17 @@ from kivy.network.urlrequest import UrlRequest
 
 
 class HMS:
-    _tokenURL = "{baseURL}/oauth/token"
-    _clientToken = []
-    _userToken = []
+    _token_URL = "{baseURL}/oauth/token"
+    _rfid_token_URL = "{baseUrl}/api/cc/rfid-token"
+    _can_check_URL = "{baseURL}/api/can"
+    _client_token = []
+    _user_token = []
 
     def __init__(self):
         pass
 
     def build_config(self, config):
-        Logger.debug("HMS@build_config")
+        Logger.debug("HMS: build_config")
         config.setdefaults(
             "HMS",
             {
@@ -53,7 +55,7 @@ class HMS:
         )
 
     def build_settings(self, settings, config):
-        Logger.debug("HMS@build_settings")
+        Logger.debug("HMS: build_settings")
         jsondata = json.dumps(
             [
                 {
@@ -82,4 +84,4 @@ class HMS:
         settings.add_json_panel("HMS", config, data=jsondata)
 
     def on_config_change(self, config, section, key, value):
-        Logger.debug("HMS@on_config_change")
+        Logger.debug("HMS: on_config_change")

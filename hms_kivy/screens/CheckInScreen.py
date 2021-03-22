@@ -59,7 +59,7 @@ class CheckInScreen(Screen):
     def on_enter(self):
         Logger.debug("CheckInScreen@on_enter")
         self._app = App.get_running_app()
-        self._app.updateTitle("Finding Next Meeting")
+        self._app.update_title("Finding Next Meeting")
 
     def on_leave(self):
         Logger.debug("CheckInScreen@on_leave")
