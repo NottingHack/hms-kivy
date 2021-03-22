@@ -159,6 +159,7 @@ class KioskApp(App):
         if self._logout_clock is not None:
             # cancel the
             self._logout_clock.cancel()
+            self._logout_clock = None
             self.status_label = "Logged in"
 
         if self._uid == uid:
