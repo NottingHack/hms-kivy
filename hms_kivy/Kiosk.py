@@ -123,8 +123,6 @@ class KioskApp(App):
     def on_start(self, *args):
         self.rfid.start_RFID_read()
         self.rfid.bind(on_remove=self.on_rfid_remove)
-
-        # done in LogInScreen for now
         self.enable_login()
 
     def on_stop(self, *args):

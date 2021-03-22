@@ -49,7 +49,6 @@ class LogInScreen(Screen):
         self._app = App.get_running_app()
         # self._app.rfid.bind("on_present")
         self._app.update_title()
-        # self._app.enable_login()
         self._app.rfid.bind(on_present=self.on_rfid_present)
         self._app.rfid.bind(on_remove=self.on_rfid_remove)
 
