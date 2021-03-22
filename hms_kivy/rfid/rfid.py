@@ -71,7 +71,7 @@ class RFID(EventDispatcher):
         config.setdefaults(
             "RFID",
             {
-                "read_timeout": 5,
+                "read_timeout": 2,
                 "listen_port": 7861,
                 "UDP_listen_timeout": 2,
             },
@@ -196,13 +196,14 @@ class RFID(EventDispatcher):
                     "RFID", "read_timeout"
                 ):
                     last_read_time = time()
-                    last_uid = None
-                    try:
-                        self.q_RFID.put_nowait(None)
-                    except queue.Full:
-                        Logger.debug(
-                            f"tRC522read: Failed to put REMOVE on q_RFID as it's full"
-                        )
+                    if last_uid is not None:
+                        last_uid = None
+                        try:
+                            self.q_RFID.put_nowait(None)
+                        except queue.Full:
+                            Logger.debug(
+                                f"tRC522read: Failed to put REMOVE on q_RFID as it's full"
+                            )
 
             self.t_RFID_stop.wait(0.5)
         Logger.debug("tRC522read: Thread stopped")

@@ -56,7 +56,7 @@ class LogInScreen(Screen):
     def on_leave(self):
         Logger.debug("LogInScreen: on_leave")
         self.status_message = ""
-        self._app.disable_login()  #  not sure about this one yet might leave it enabled
+        # self._app.disable_login()  #  not sure about this one yet might leave it enabled
         self._app.rfid.unbind(on_present=self.on_rfid_present)
         self._app.rfid.unbind(on_remove=self.on_rfid_remove)
 

@@ -2,8 +2,6 @@
 
 #:set quorumNotMet (1, 0, 0, .8)
 #:set quorumMet (0, 1, 0, .8)
-#:set hsGreen (0.098, 0.349, 0.02, 0.9)
-#:set border (0, 0, 0, 1)
 
 <CheckInScreen>:
     name: "checkIn"
@@ -30,7 +28,7 @@
                     size_hint: 1, 0.25
                     canvas.before:
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
@@ -40,7 +38,7 @@
                     spacing: dp(2)
                     canvas.before:
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
@@ -101,7 +99,7 @@
                     size_hint: 1, 0.25
                     canvas.before:
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
@@ -112,7 +110,7 @@
                     spacing: dp(2)
                     canvas.before:
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
@@ -172,7 +170,7 @@
                     size_hint: 1, 0.25
                     canvas.before:
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
@@ -184,7 +182,7 @@
                             pos: self.pos
                             size: self.size
                         Color:
-                            rgba: border
+                            rgba: black
                         Line:
                             width: 2
                             rectangle: self.x, self.y, self.width, self.height
