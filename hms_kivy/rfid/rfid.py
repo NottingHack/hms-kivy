@@ -192,7 +192,7 @@ class RFID(EventDispatcher):
             else:
                 # could not read a card
                 # clear last read if it was a while ago
-                if ((time.time() - last_read_time)) > self._config.getint(
+                if ((time() - last_read_time)) > self._config.getint(
                     "RFID", "read_timeout"
                 ):
                     last_read_time = time()
