@@ -136,7 +136,7 @@ class HMS:
         if section != "HMS":
             return
 
-        if key == client_id or key == client_secret:
+        if key == "client_id" or key == "client_secret":
             Cache.remove("HMS", "client_token")
             self._get_client_token()
 
