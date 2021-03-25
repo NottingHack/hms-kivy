@@ -10,4 +10,71 @@
             pos: self.pos
             size: self.size
 
-    # FloatLayout:
+    BoxLayout:
+        orientation: 'vertical'
+        # orientation: 'horizontal'
+        padding: dp(5),dp(2),dp(5),dp(2)
+        spacing: dp(5)
+        # BoxLayout:
+            # orientation: 'horizontal'
+            #
+        GridLayout:
+            cols:2
+
+            id: buttons_gird
+            padding: dp(15),dp(5),dp(15),dp(5)
+            spacing: dp(15)
+
+            font_size: (root.width**2 + root.height**2) / 13**4
+            Button:
+                id: projects
+                text: "Projects"
+                on_release: root.on_projects()
+            Button:
+                id: boxes
+                # font_size: (root.width**2 + root.height**2) / 13**4
+                text: "Boxes"
+                on_release: root.on_boxes()
+
+        GridLayout:
+            cols:2
+            id: bottom_layout
+            # orientation: 'horizontal'
+            size_hint_y: None
+
+            Label:
+                id: status
+                # size_hint: 1, 0.15
+                text: 'Snackspace balance:'
+                font_size: '35sp'
+                text_size: self.size
+                # halign: 'center'
+                # valign: 'middle'
+            Label:
+                id: balance
+                # size_hint: 1, 0.15
+                text: root.balance
+                font_size: '35sp'
+                text_size: self.size
+                # halign: 'center'
+                # valign: 'middle'
+        # Button:
+        #     id: cancel
+        #     # pos_hint:{"x":0.05,"y":0.05}
+        #     # size_hint: 0.9, 0.2
+        #     font_size: (root.width**2 + root.height**2) / 13**4
+        #     text: "Cancel"
+        #     on_release: root.on_cancel()
+
+
+<RegisterRfid@Button>:
+    id: register_rfid
+    # font_size: (root.width**2 + root.height**2) / 13**4
+    text: "Register RFID for member"
+    on_release: root.on_register_rfid()
+
+<MeetingCheckIn@Button>:
+    id: meeting_check_in
+    # font_size: (root.width**2 + root.height**2) / 13**4
+    text: "Meeting Check In"
+    on_release: root.on_meeting_check_in()
