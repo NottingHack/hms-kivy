@@ -33,17 +33,17 @@ def test_present_no_uid():
     assert "Error: Missing argument 'UID'." in result.stderr
 
 
-def test_present_with_uid():
-    uid = "12ed89a5"
-    result = runner.invoke(app, ["present", uid])
-    assert result.exit_code == 0
-    assert f"Presenting RFID {uid}" in result.stdout
+# def test_present_with_uid():
+#     uid = "12ed89a5"
+#     result = runner.invoke(app, ["present", uid])
+#     assert result.exit_code == 0
+#     assert f"Presenting RFID {uid}" in result.stdout
 
 
-def test_remove():
-    result = runner.invoke(app, "remove")
-    assert result.exit_code == 0
-    assert "Removing RFID" in result.stdout
+# def test_remove():
+#     result = runner.invoke(app, "remove")
+#     assert result.exit_code == 0
+#     assert "Removing RFID" in result.stdout
 
 
 def test_send_packet():

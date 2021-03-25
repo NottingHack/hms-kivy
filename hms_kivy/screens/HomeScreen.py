@@ -47,7 +47,7 @@ class HomeScreen(Screen):
         Logger.debug("HomeScreen: on_enter")
         self.status_message = ""
         self._app = App.get_running_app()
-        self._app.update_title(f"Welcome {self._app.user['name']}")
+        self._app.update_title(f"Welcome {self._app.user.get_name()}")
 
         # check permission to display buttons?
 

@@ -47,11 +47,11 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.settings import SettingsWithTabbedPanel
 
-from .hms import HMS
+Builder.load_file(os.path.join(os.path.dirname(__file__), "style.kv"))
+
+from .hms import HMS, User
 from .rfid.rfid import RFID
 from .screens import SettingsPasswordScreen, LogInScreen, HomeScreen
-
-Builder.load_file(os.path.join(os.path.dirname(__file__), "style.kv"))
 
 
 class ScreenSwitcher(ScreenManager):
@@ -78,12 +78,15 @@ class KioskApp(App):
     settings_cls = SettingsWithTabbedPanel
 
     status_label = StringProperty("Present Card")
+    title_label = StringProperty("")
+    manager = None
 
     rfid = RFID()
     hms = HMS()
 
     _previous_screen = None
     _logout_clock = None
+    _remove_card_clock = None
 
     _uid = None
     user = None
@@ -121,27 +124,39 @@ class KioskApp(App):
         self.rfid.on_config_change(config, section, key, value)
 
     def on_start(self, *args):
+        Logger.debug("Kiosk: on_start")
+
+        # pull out the manager
+        self.manager = self.root.ids.manager
+        # warm up hms
+        self.hms.start()
+        # start the rfid reader
         self.rfid.start_RFID_read()
         self.rfid.bind(on_remove=self.on_rfid_remove)
+        # and enable login
         self.enable_login()
 
     def on_stop(self, *args):
+        Logger.debug("Kiosk: on_stop")
         self.rfid.stop_RFID_read()
+        self.hms.stop()
 
     def update_title(self, text=""):
-        if self.root:
-            self.root.ids.title.text = text
+        self.title_label = text
 
     def open_settings_password(self):
         self.set_screen("settingsPassword")
 
+    def get_screen(self, screen):
+        return self.manager.get_screen(screen)
+
     def set_screen(self, screen):
-        self._previous_screen = self.root.ids.manager.current
-        self.root.ids.manager.current = screen
+        self._previous_screen = self.manager.current
+        self.manager.current = screen
 
     def restore_previous_screen(self):
-        previous_screen = self.root.ids.manager.current
-        self.root.ids.manager.current = self._previous_screen
+        previous_screen = self.manager.current
+        self.manager.current = self._previous_screen
         self._previous_screen = previous_screen
 
     def enable_login(self):
@@ -172,32 +187,45 @@ class KioskApp(App):
 
         self._uid = uid
 
-        if self.root.ids.manager.current != "login":
+        if self.manager.current != "login":
             self.set_screen("login")
 
         self.status_label = "Logging in..."
-        self.hms.login(uid, on_success=self.login_success, on_fail=self.login_failed)
+        self.user = User(self.hms)
+        self.user.login(
+            uid, on_success=self.login_success_cb, on_fail=self.login_failed_cb
+        )
 
-    def login_success(self, user, permissions):
-        Logger.debug(f"Kiosk: login_success: {user['name']}")
-        self.user = user
-        self.permissions = permissions
+    def login_success_cb(self, uid):
+        Logger.debug(f"Kiosk: login_success_cb")
+        if self.user.user and self.user.permissions:
+            self.status_label = "Logged in"
+            # self.root.ids.logout.disabled = False
+            # move to the next screen
+            self.set_screen("home")
 
-        self.status_label = "Logged in"
-        # self.root.ids.logout.disabled = False
-        # move to the next screen
-        self.set_screen("home")
-
-    def login_failed(self, reason):
-        Logger.debug(f"Kiosk: login_failed: {reason}")
+    def login_failed_cb(self, reason):
+        Logger.debug(f"Kiosk: login_failed_cb: {reason}")
         #  login failed for some reason need to flash on the login screen
-        self.root.ids.manager.get_screen("login").status_message = reason
+        self.status_label = "Login fail"
+        self.get_screen("login").set_status_message(reason)
         self._uid = None
+
+        # clock to clear message?
+        self._remove_card_clock = Clock.schedule_once(
+            lambda dt: self.get_screen("login").set_status_message("Remove Card"),
+            5,
+        )
+        # or swap to say remove card
 
     def on_rfid_remove(self, *args, **kwargs):
         Logger.debug("Kiosk: on_rfid_remove")
-        if self.root.ids.manager.current == "checkIn":
+        if self.manager.current == "checkIn":
             return
+
+        if self._remove_card_clock:
+            self._remove_card_clock.cancel()
+            self._remove_card_clock = None
 
         # start logout count down
         if self._logout_clock is None:
@@ -205,10 +233,10 @@ class KioskApp(App):
 
     def logout(self, count=0):
         Logger.debug(f"Kiosk: logout {count}")
-        if self.root.ids.manager.current == "checkIn":
+        if self.manager.current == "checkIn":
             return
 
-        if count == 0:
+        if count == 0 or self._uid == None or self.user == None:
             self._logout_clock = None
             self._uid = None
             self.user = None

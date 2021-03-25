@@ -66,5 +66,8 @@ class LogInScreen(Screen):
     def on_rfid_remove(self, *args):
         self.status_message = ""
 
+    def set_status_message(self, message):
+        self.status_message = message
+
 
 load_kv()
