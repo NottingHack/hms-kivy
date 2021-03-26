@@ -305,7 +305,7 @@ class HMS:
 
         return None
 
-    def get_request(self, url, callback, data=None):
+    def _handle_request(self, method, url, callback, data=None):
         # get rfid token
         rfid_token = self.get_rfid_token()
         if rfid_token is None:
@@ -320,7 +320,7 @@ class HMS:
 
         return UrlRequest(
             url=self._config.get("HMS", "url") + url,
-            method="GET",
+            method=method,
             req_headers=headers,
             req_body=data,
             on_success=callback,
@@ -330,31 +330,18 @@ class HMS:
             ca_file=self._config.get("HMS", "ca_file"),
             verify=self._config.getboolean("HMS", "verify_ssl"),
         )
+
+    def get_request(self, url, callback, data=None):
+        return self._handle_request("GET", url, callback, data)
 
     def post_request(self, url, callback, data=None):
-        # get rfid token
-        rfid_token = self.get_rfid_token()
-        if rfid_token is None:
-            # was not in the Cache
-            return None
+        return self._handle_request("POST", url, callback, data)
 
-        # prep headers with the rfid_token
-        headers = self._json_headers
-        headers[
-            "Authorization"
-        ] = f'{rfid_token["token_type"]} {rfid_token["access_token"]}'
+    def patch_request(self, url, callback, data=None):
+        return self._handle_request("PATCH", url, callback, data)
 
-        return UrlRequest(
-            url=self._config.get("HMS", "url") + url,
-            req_headers=headers,
-            req_body=data,
-            on_success=callback,
-            on_error=callback,
-            on_failure=callback,
-            timeout=5,
-            ca_file=self._config.get("HMS", "ca_file"),
-            verify=self._config.getboolean("HMS", "verify_ssl"),
-        )
+    def delete_request(self, url, callback, data=None):
+        return self._handle_request("DELETE", url, callback, data)
 
     def forget_rfid_token(self):
         Cache.remove("HMS", "rfid_token")
