@@ -2,7 +2,7 @@
 """ HMS Kiosk (HMS User module)
 
     Author: Matt Lloyd
-    Copyright (c) 2020 Nottingham Hackspace
+    Copyright (c) 2021 Nottingham Hackspace
 
     The MIT License (MIT)
 
@@ -167,7 +167,7 @@ class User:
         return None
 
     def can(self, permission):
-        if self.permissions and self.permissions[permission]:
+        if self.permissions and permission in self.permissions:
             return self.permissions[permission]
 
         return False

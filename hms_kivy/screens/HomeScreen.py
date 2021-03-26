@@ -31,7 +31,7 @@ import json
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, BooleanProperty
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen
 
@@ -41,6 +41,8 @@ from ..utils import load_kv
 class HomeScreen(Screen):
     status_message = StringProperty("hello")
     balance = StringProperty("")
+    register_rfid_allowed = BooleanProperty(False)
+    meeting_check_in_allowed = BooleanProperty(False)
     _app = None
     user = None
 
@@ -53,10 +55,10 @@ class HomeScreen(Screen):
         self._app = App.get_running_app()
         self.user = self._app.user
         self._app.update_title(f"Welcome {self.user.get_name()}")
-        self.balance = f"£{(self.user.get_balance() / 100):.2f}"
-        # check permission to display buttons?
-        if self.user.can("search.users") and self.user.can("pins.reactivate"):
-            self.ids.buttons_gird.add_widget(RegisterRfid())
+        self.balance = f"Snackspace balance: £{(2000 / 100):.2f}"
+
+        # self.register_rfid_allowed = self.user.can("search.users") and self.user.can("pins.reactivate")
+        # self.meeting_check_in_allowed = self.user.can("governance.meeting.checkIn") # and next agm?
 
     def on_leave(self):
         Logger.debug("HomeScreen: on_leave")
@@ -67,19 +69,11 @@ class HomeScreen(Screen):
     def on_boxes(self):
         Logger.debug("HomeScreen: on_boxes")
 
-    def on_register_card(self):
-        Logger.debug("HomeScreen: on_register_card")
+    def on_register_rfid(self):
+        Logger.debug("HomeScreen: on_register_rfid")
 
-    def on_meeting(self):
-        Logger.debug("HomeScreen: on_meeting")
-
-
-class RegisterRfid(Button):
-    pass
-
-
-class MeetingCheckIn(Button):
-    pass
+    def on_meeting_check_in(self):
+        Logger.debug("HomeScreen: on_meeting_check_in")
 
 
 load_kv()

@@ -5,7 +5,7 @@
     pi-rc522 (https://github.com/kevinvalk/pi-rc522.git)
 
     Author: Matt Lloyd
-    Copyright (c) 2020 Nottingham Hackspace
+    Copyright (c) 2021 Nottingham Hackspace
 
     The MIT License (MIT)
 

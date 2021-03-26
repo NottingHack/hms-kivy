@@ -21,29 +21,29 @@
     FloatLayout:
         Label:
             text: "ID: "
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             pos_hint: {"x":0.1, "top":0.9}
             size_hint: 0.09, 0.15
         TextInput:
             id: clientId
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             multiline: False
             pos_hint: {"x": 0.27 , "top":0.9}
             size_hint: 0.70, 0.15
         Label:
             text: "Secret: "
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             pos_hint: {"x":0.1, "top":0.7}
             size_hint: 0.09, 0.15
         TextInput:
             id: clientSecret
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             multiline: False
             pos_hint: {"x": 0.27, "top":0.7}
             size_hint: 0.70, 0.15
         Label:
             text: "Prod: "
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             pos_hint:{"x":0.1,"y":0.3}
             size_hint: 0.09, 0.15
         Switch:
@@ -54,7 +54,7 @@
             id: btn
             pos_hint:{"x":0.05,"y":0.05}
             size_hint: 0.9, 0.2
-            font_size: (root.width**2 + root.height**2) / 13**4
+            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
             text: "Connect"
             on_release:
                 root.manager.transition.direction = "up"

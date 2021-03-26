@@ -2,7 +2,7 @@
 """ HMS Kiosk (HMS module)
 
     Author: Matt Lloyd
-    Copyright (c) 2020 Nottingham Hackspace
+    Copyright (c) 2021 Nottingham Hackspace
 
     The MIT License (MIT)
 
