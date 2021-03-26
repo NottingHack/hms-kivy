@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" HMS Kiosk LogInScreen
+""" HMS Kiosk ProjectsScreen
 
     Author: Matt Lloyd
     Copyright (c) 2021 Nottingham Hackspace
@@ -25,47 +25,47 @@
     SOFTWARE.
 """
 
-__all__ = ("LogInScreen",)
+__all__ = ("ProjectsScreen",)
+import json
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.logger import Logger
-from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
 
 from ..utils import load_kv
+from ..hms import Projects
 
 
-class LogInScreen(Screen):
-    status_message = StringProperty("")
-
+class ProjectsScreen(Screen):
     _app = None
+    user = None
+    projects = None
 
     def __init__(self, **kwargs):
-        super(LogInScreen, self).__init__(**kwargs)
+        super(ProjectsScreen, self).__init__(**kwargs)
 
     def on_enter(self):
-        Logger.debug("LogInScreen: on_enter")
-        self.status_message = ""
+        Logger.debug("ProjectsScreen: on_enter")
         self._app = App.get_running_app()
-        self._app.update_title()
-        self._app.rfid.bind(on_present=self.on_rfid_present)
-        self._app.rfid.bind(on_remove=self.on_rfid_remove)
+        self.user = self._app.user
+        self._app.set_home_button("Home")
+        self._app.update_title(f"{self.user.get_name()}'s Projects")
+        self._app.home_button.bind(on_release=self.on_home_pressed)
+
+        self.projects = Projects(self._app.hms)
+        self.projects.index(self.index_cb)
 
     def on_leave(self):
-        Logger.debug("LogInScreen: on_leave")
-        self.status_message = ""
-        self._app.rfid.unbind(on_present=self.on_rfid_present)
-        self._app.rfid.unbind(on_remove=self.on_rfid_remove)
+        Logger.debug("ProjectsScreen: on_leave")
+        self._app.home_button.unbind(on_release=self.on_home_pressed)
 
-    def on_rfid_present(self, obj, uid):
-        Logger.debug(f"Kiosk: on_rfid_present: {uid}")
-        self.status_message = "Attempting Login"
+    def on_home_pressed(self, *args):
+        Logger.debug("ProjectsScreen: on_home_pressed")
+        self._app.set_screen("home")
 
-    def on_rfid_remove(self, *args):
-        self.status_message = ""
-
-    def set_status_message(self, message):
-        self.status_message = message
+    def index_cb(self):
+        Logger.debug("ProjectsScreen: index_cb")
 
 
 load_kv()

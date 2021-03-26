@@ -40,6 +40,8 @@ class SettingsPasswordScreen(Screen):
     password = ObjectProperty(None)
 
     _app = None
+    _previous_home_label = None
+    _previous_home_disabled = None
 
     def __init__(self, **kwargs):
         super(SettingsPasswordScreen, self).__init__(**kwargs)
@@ -48,10 +50,18 @@ class SettingsPasswordScreen(Screen):
         Logger.debug("SettingsPasswordScreen: on_enter")
         self.statusMessage = ""
         self._app = App.get_running_app()
+        self._previous_home_label = self._app.home_label
+        self._previous_home_disabled = self._app.home_button.disabled
+        self._app.set_home_button("Cancel")
         self._app.update_title("Settings Locked")
+        self._app.home_button.bind(on_release=self.on_cancel)
 
     def on_leave(self):
         Logger.debug("SettingsPasswordScreen: on_leave")
+        self._app.home_button.unbind(on_release=self.on_cancel)
+        self._app.set_home_button(
+            self._previous_home_label, self._previous_home_disabled
+        )
 
     def on_confirm(self):
         Logger.debug("SettingsPasswordScreen: on_confirm")
@@ -63,7 +73,7 @@ class SettingsPasswordScreen(Screen):
             # TODO: flash the screen
             Logger.debug("SettingsPasswordScreen@on_confirm: password miss")
 
-    def on_cancel(self):
+    def on_cancel(self, *args):
         Logger.debug("SettingsPasswordScreen: on_cancel")
         self.password.text = ""
         self._app.restore_previous_screen()

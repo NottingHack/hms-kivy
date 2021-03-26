@@ -11,19 +11,14 @@ GridLayout:
         pos_hint: {'top': 1, 'y': 0}
         padding: dp(5),dp(2),dp(5),dp(2)
         spacing: dp(5)
-        # Button:
-        #     id: logout
-        #     text: "Logout"
-        #     size_hint_x: 0.2
-        #     disabled: True
-        #     on_release:
-        #         app.logout()
-        BackgroundLabel:
-            id: status
-            text: app.status_label
+        Button:
+            id: home_button
+            text: app.home_label
             font_size: '20sp'
             size_hint_x: 0.2
-            background_color: 0.2, 0.2, 0.2, 1
+            disabled: True
+            on_release:
+                app.on_home_pressed()
         Label:
             id: title
             text: app.title_label

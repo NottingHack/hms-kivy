@@ -8,3 +8,6 @@ from .SettingsPasswordScreen import *
 from .LogInScreen import *
 from .CheckInScreen import *
 from .HomeScreen import *
+from .ProjectsScreen import *
+from .BoxesScreen import *
+from .RfidRegistrationScreen import *

@@ -51,7 +51,14 @@ Builder.load_file(os.path.join(os.path.dirname(__file__), "style.kv"))
 
 from .hms import HMS, User
 from .rfid.rfid import RFID
-from .screens import SettingsPasswordScreen, LogInScreen, HomeScreen
+from .screens import (
+    SettingsPasswordScreen,
+    LogInScreen,
+    HomeScreen,
+    ProjectsScreen,
+    BoxesScreen,
+    RfidRegistrationScreen,
+)
 
 
 class ScreenSwitcher(ScreenManager):
@@ -61,6 +68,9 @@ class ScreenSwitcher(ScreenManager):
         self.add_widget(LogInScreen())
         self.add_widget(SettingsPasswordScreen())
         self.add_widget(HomeScreen())
+        self.add_widget(ProjectsScreen())
+        self.add_widget(BoxesScreen())
+        self.add_widget(RfidRegistrationScreen())
 
 
 # TopBar Digital Clock
@@ -77,9 +87,10 @@ class KioskApp(App):
     # use_kivy_settings = False
     settings_cls = SettingsWithTabbedPanel
 
-    status_label = StringProperty("Present Card")
+    home_label = StringProperty("Present Card")
     title_label = StringProperty("")
     manager = None
+    home_button = None
 
     rfid = RFID()
     hms = HMS()
@@ -126,8 +137,9 @@ class KioskApp(App):
     def on_start(self, *args):
         Logger.debug("Kiosk: on_start")
 
-        # pull out the manager
+        # pull out the manager and home_button
         self.manager = self.root.ids.manager
+        self.home_button = self.root.ids.home_button
         # warm up hms
         self.hms.start()
         # start the rfid reader
@@ -173,11 +185,11 @@ class KioskApp(App):
             # cancel the
             self._logout_clock.cancel()
             self._logout_clock = None
-            self.status_label = "Logged in"
+            self.set_home_button("Logged in", True)
 
         if self._uid == uid:
             # we are likely already logged in with this user
-            self.status_label = "Logged in"
+            self.set_home_button("Logged in", True)
             return
 
         if self.user is not None:
@@ -190,7 +202,7 @@ class KioskApp(App):
         if self.manager.current != "login":
             self.set_screen("login")
 
-        self.status_label = "Logging in..."
+        self.set_home_button("Logging in...", True)
         self.user = User(self.hms)
         self.user.login(
             uid, on_success=self.login_success_cb, on_fail=self.login_failed_cb
@@ -199,15 +211,14 @@ class KioskApp(App):
     def login_success_cb(self, uid):
         Logger.debug(f"Kiosk: login_success_cb")
         if self.user.user and self.user.permissions:
-            self.status_label = "Logged in"
-            # self.root.ids.logout.disabled = False
+            self.set_home_button("Logged in", True)
             # move to the next screen
             self.set_screen("home")
 
     def login_failed_cb(self, reason):
         Logger.debug(f"Kiosk: login_failed_cb: {reason}")
         #  login failed for some reason need to flash on the login screen
-        self.status_label = "Login fail"
+        self.set_home_button("Login fail", True)
         self.get_screen("login").set_status_message(reason)
         self._uid = None
 
@@ -241,19 +252,25 @@ class KioskApp(App):
             self._uid = None
             self.user = None
             self.permissions = None
-            # self.root.ids.logout.disabled = True
             self.update_title()
             # bypass normal set_screen logic
             self._previous_screen = "login"
             self.root.ids.manager.current = "login"
 
-            self.status_label = "Present Card"
+            self.set_home_button("Present Card", True)
         else:
             # display the count
-            self.status_label = f"Logout in {count}"
+            self.set_home_button(f"Logout in {count}", True)
             self._logout_clock = Clock.schedule_once(
                 lambda dt: self.logout(count - 1), 1
             )
+
+    def set_home_button(self, label, disabled=False):
+        self.home_label = label
+        self.home_button.disabled = disabled
+
+    def on_home_pressed(self, *args):
+        Logger.debug("Kiosk: on_home_pressed")
 
 
 def main():

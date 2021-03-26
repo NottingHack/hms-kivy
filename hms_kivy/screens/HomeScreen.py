@@ -39,7 +39,6 @@ from ..utils import load_kv
 
 
 class HomeScreen(Screen):
-    status_message = StringProperty("hello")
     balance = StringProperty("")
     register_rfid_allowed = BooleanProperty(False)
     meeting_check_in_allowed = BooleanProperty(False)
@@ -54,6 +53,7 @@ class HomeScreen(Screen):
         self.status_message = ""
         self._app = App.get_running_app()
         self.user = self._app.user
+        self._app.set_home_button("Logged in", True)
         self._app.update_title(f"Welcome {self.user.get_name()}")
         self.balance = f"Snackspace balance: £{(self.user.get_balance() / 100):.2f}"
 
@@ -65,9 +65,11 @@ class HomeScreen(Screen):
 
     def on_projects(self):
         Logger.debug("HomeScreen: on_projects")
+        self._app.set_screen("projects")
 
     def on_boxes(self):
         Logger.debug("HomeScreen: on_boxes")
+        self._app.set_screen("boxes")
 
     def on_register_rfid(self):
         Logger.debug("HomeScreen: on_register_rfid")
