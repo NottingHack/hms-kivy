@@ -55,7 +55,7 @@ class HomeScreen(Screen):
         self._app = App.get_running_app()
         self.user = self._app.user
         self._app.update_title(f"Welcome {self.user.get_name()}")
-        self.balance = f"Snackspace balance: £{(2000 / 100):.2f}"
+        self.balance = f"Snackspace balance: £{(self.user.get_balance() / 100):.2f}"
 
         # self.register_rfid_allowed = self.user.can("search.users") and self.user.can("pins.reactivate")
         # self.meeting_check_in_allowed = self.user.can("governance.meeting.checkIn") # and next agm?
