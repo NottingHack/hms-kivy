@@ -6,7 +6,8 @@ A kiosk for use in the space allowing registration of new RFID cards, Member man
 
 These have been designed to run on a Raspberry Pi with an official 7" touch screen and an attached RC522 RFID reader
 
-![Screenshot](docs/hms-kivy.png)
+![Begin](docs/hms-kivy.png)
+![Home](docs/hms-kivy-home.png)
 
 ## Requirements
 
