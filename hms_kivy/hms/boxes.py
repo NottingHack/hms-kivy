@@ -31,40 +31,34 @@ from http import HTTPStatus
 
 from kivy.logger import Logger
 
+# states
+INUSE = 10
+REMOVED = 20
+ABANDONED = 30
+
+# {
+#     "id": 1,
+#     "boughtDate": "2021-03-26",
+#     "removedDate": null,
+#     "state": 10,
+#     "stateString": "In Use",
+#     "userId": 953
+# }
+
 
 class Boxes:
     hms = None
-
-    # states
-    INUSE = 10
-    REMOVED = 20
-    ABANDONED = 30
+    boxes = []
 
     _audit_URL = "api/boxes/audit"  # GET
-    _mark_in_use_URL = "api/boxes/{box}/markInUse"  # PATCH
-    _mark_abandoned_URL = "api/boxes/{box}/markAbandoned"  # PATCH
-    _mark_removed_URL = "api/boxes/{box}/markRemoved"  # PATCH
-    _print_URL = "api/boxes/{box}/print"  # POST
     _index_URL = "api/boxes"  # GET
-    # _store_URL = "api/projects"  # POST
     _show_URL = "api/boxes/{box}"  # GET
-
-    # [
-    #     {
-    #         "id": 1,
-    #         "boughtDate": "2021-03-26T03:13:39.000000Z",
-    #         "removedDate": null,
-    #         "state": 10,
-    #         "stateString": "In Use",
-    #         "userId": 953
-    #     }
-    # ]
-    boxes = []
+    # _store_URL = "api/projects"  # POST
 
     def __init__(self, hms):
         self.hms = hms
 
-    def index(self, callback):
+    def index(self, callback=None):
         Logger.debug("Boxes: index")
 
         return self.hms.get_request(
@@ -74,109 +68,200 @@ class Boxes:
             ),
         )
 
-    def _index_cb(self, request, result, callback):
+    def _index_cb(self, request, result, callback=None):
         Logger.debug(f"Boxes: _index_cb {request.url} {request.resp_status}")
         Logger.debug(f"Boxes: _index_cb {result}")
 
         if self._index_URL in request.url and request.resp_status == HTTPStatus.OK:
-            self.boxes = result["data"]
-            callback()
+            # self.boxes = result["data"]
+            self.boxes = []
+            for box in result["data"]:
+                self.boxes.append(Box(self.hms, box))
+            if callback is not None:
+                callback(self.boxes)
 
-    def show(self, box, callback):
+    def show(self, box, callback=None):
         Logger.debug(f"Boxes: show {box}")
 
         return self.hms.get_request(
             self._show_URL.format(box=box),
-            lambda request, result, callback=callback: self._index_cb(
+            lambda request, result, box=box, callback=callback: self._show_cb(
                 request, result, callback
             ),
         )
 
-    def _show_cb(self, request, result, callback):
+    def _show_cb(self, request, result, box, callback=None):
         Logger.debug(f"Boxes: _show_cb {request.url} {request.resp_status}")
         Logger.debug(f"Boxes: _show_cb {result}")
 
-        if self._show_URL in request.url and request.resp_status == HTTPStatus.OK:
-            self.boxs = result["data"]
-            callback()
+        if (
+            self._show_URL.format(box=box) in request.url
+            and request.resp_status == HTTPStatus.OK
+        ):
+            # if Box of this id is in boxes update it and return that instance
+            # else add a new one to boxes and return it
+            box = Box(self.hms, result["data"])
+            if callback is not None:
+                callback(box)
 
-    def print(self, box, callback):
-        Logger.debug(f"Boxes: print {box}")
+
+class Box:
+    hms = None
+    id = None
+    bought_date = None
+    removed_date = None
+    state = None
+    state_string = None
+    user_id = None
+
+    _mark_in_use_URL = "api/boxes/{box}/markInUse"  # PATCH
+    _mark_abandoned_URL = "api/boxes/{box}/markAbandoned"  # PATCH
+    _mark_removed_URL = "api/boxes/{box}/markRemoved"  # PATCH
+    _print_URL = "api/boxes/{box}/print"  # POST
+
+    def __init__(self, hms, box):
+        self.hms = hms
+        self._populate_from_box(box)
+
+    def _populate_from_box(self, box):
+        self.id = box["id"]
+        self.bought_date = box["boughtDate"]
+        self.removed_date = box["removedDate"]
+        self.state = box["state"]
+        self.state_string = box["stateString"]
+        self.user_id = box["userId"]
+
+    def mark_string(self):
+        """Which mark function can be called for this box
+        Removed
+        Abandoned
+        In Use
+        """
+
+        if self.state == INUSE:
+            return "Mark Removed"
+        else:
+            return "Mark In Use"
+
+    def mark(self, callback=None):
+        """call the correct mark function based on current state
+        Removed
+        Abandoned
+        In Use
+        """
+
+        if self.state == INUSE:
+            return self.mark_removed(callback)
+        else:
+            return self.mark_in_use(callback)
+
+    def print(self, callback=None):
+        Logger.debug(f"Box ({self.id}): print")
 
         return self.hms.patch_request(
             self._print_URL.format(box=box),
-            lambda request, result, callback=callback: self._index_cb(
+            lambda request, result, callback=callback: self._print_cb(
                 request, result, callback
             ),
         )
 
-    def _print_cb(self, request, result, callback):
-        Logger.debug(f"Boxes: _print_cb {request.url} {request.resp_status}")
-        Logger.debug(f"Boxes: _print_cb {result}")
-
-        if self._print_URL in request.url and request.resp_status == HTTPStatus.OK:
-            self.boxs = result["data"]
-            callback()
-
-    def mark_in_use(self, box, callback):
-        Logger.debug(f"Boxes: mark_in_use {box}")
-
-        return self.hms.patch_request(
-            self._mark_in_use_URL.format(box=box),
-            lambda request, result, callback=callback: self._index_cb(
-                request, result, callback
-            ),
-        )
-
-    def _mark_in_use_cb(self, request, result, callback):
-        Logger.debug(f"Boxes: _mark_in_use_cb {request.url} {request.resp_status}")
-        Logger.debug(f"Boxes: _mark_in_use_cb {result}")
+    def _print_cb(self, request, result, callback=None):
+        Logger.debug(f"Box ({self.id}): _print_cb {request.url} {request.resp_status}")
+        Logger.debug(f"Box ({self.id}): _print_cb {result}")
 
         if (
-            self._mark_in_use_URL in request.url
-            and request.resp_status == HTTPStatus.OK
+            self._print_URL.format(box=box) in request.url
+            and request.resp_status == HTTPStatus.ACCEPTED
         ):
-            self.boxs = result["data"]
-            callback()
+            if callback is not None:
+                callback()
 
-    def mark_abandoned(self, box, callback):
-        Logger.debug(f"Boxes: mark_abandoned {box}")
+    def mark_in_use(self, callback=None):
+        Logger.debug(f"Box ({self.id}): mark_in_use")
 
         return self.hms.patch_request(
-            self._show_Umark_abandonedormat(box=box),
-            lambda request, result, callback=callback: self._index_cb(
+            self._mark_in_use_URL.format(box=self.id),
+            lambda request, result, callback=callback: self._mark_in_use_cb(
                 request, result, callback
             ),
         )
 
-    def _mark_abandoned_cb(self, request, result, callback):
-        Logger.debug(f"Boxes: _mark_abandoned_cb {request.url} {request.resp_status}")
-        Logger.debug(f"Boxes: _mark_abandoned_cb {result}")
+    def _mark_in_use_cb(self, request, result, callback=None):
+        Logger.debug(
+            f"Box ({self.id}): _mark_in_use_cb {request.url} {request.resp_status}"
+        )
+        Logger.debug(f"Box ({self.id}): _mark_in_use_cb {result}")
 
         if (
-            self._mark_abandoned_URL in request.url
+            self._mark_in_use_URL.format(box=self.id) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.boxs = result["data"]
-            callback()
+            self._populate_from_box(result["data"])
+            if callback is not None:
+                callback()
+        elif (
+            self._mark_in_use_URL.format(box=self.id) in request.url
+            and request.resp_status == HTTPStatus.FORBIDDEN
+        ):
+            if callback is not None:
+                callback(result["errors"][0]["detail"])
 
-    def mark_removed(self, box, callback):
-        Logger.debug(f"Boxes: mark_removed {box}")
+    def mark_abandoned(self, callback=None):
+        Logger.debug(f"Box ({self.id}): mark_abandoned")
 
         return self.hms.patch_request(
-            self._showmark_removed.format(box=box),
-            lambda request, result, callback=callback: self._index_cb(
+            self._mark_abandoned_URL.format(box=self.id),
+            lambda request, result, callback=callback: self._mark_abandoned_cb(
                 request, result, callback
             ),
         )
 
-    def _mark_removed_cb(self, request, result, callback):
-        Logger.debug(f"Boxes: _mark_removed_cb {request.url} {request.resp_status}")
-        Logger.debug(f"Boxes: _mark_removed_cb {result}")
+    def _mark_abandoned_cb(self, request, result, callback=None):
+        Logger.debug(
+            f"Box ({self.id}): _mark_abandoned_cb {request.url} {request.resp_status}"
+        )
+        Logger.debug(f"Box ({self.id}): _mark_abandoned_cb {result}")
 
         if (
-            self._mark_removed_URL in request.url
+            self._mark_abandoned_URL.format(box=self.id) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.boxs = result["data"]
-            callback()
+            self._populate_from_box(result["data"])
+            if callback is not None:
+                callback()
+        elif (
+            self._mark_abandoned_URL.format(box=self.id) in request.url
+            and request.resp_status == HTTPStatus.FORBIDDEN
+        ):
+            if callback is not None:
+                callback(result["errors"][0]["detail"])
+
+    def mark_removed(self, callback=None):
+        Logger.debug(f"Box ({self.id}): mark_removed")
+
+        return self.hms.patch_request(
+            self._mark_removed_URL.format(box=self.id),
+            lambda request, result, callback=callback: self._mark_removed_cb(
+                request, result, callback
+            ),
+        )
+
+    def _mark_removed_cb(self, request, result, callback=None):
+        Logger.debug(
+            f"Box ({self.id}): _mark_removed_cb {request.url} {request.resp_status}"
+        )
+        Logger.debug(f"Box ({self.id}): _mark_removed_cb {result}")
+
+        if (
+            self._mark_removed_URL.format(box=self.id) in request.url
+            and request.resp_status == HTTPStatus.OK
+        ):
+            self._populate_from_box(result["data"])
+            if callback is not None:
+                callback()
+        elif (
+            self._mark_removed_URL.format(box=self.id) in request.url
+            and request.resp_status == HTTPStatus.FORBIDDEN
+        ):
+            if callback is not None:
+                callback(result["errors"][0]["detail"])

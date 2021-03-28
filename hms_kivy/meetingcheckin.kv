@@ -2,7 +2,6 @@
 
 #:set quorumNotMet (1, 0, 0, .8)
 #:set quorumMet (0, 1, 0, .8)
-#:set hsGreen (0.098, 0.349, 0.02, 0.9)
 #:set border (0, 0, 0, 1)
 
 <ConnectScreen>:
@@ -12,7 +11,7 @@
     btn: btn
     prodSwitch: prodSwitch
 
-    canvas:
+    canvas.before:
         Color:
             rgba: hsGreen
         Rectangle:
@@ -70,7 +69,7 @@
             spacing: dp(5)
             BoxLayout:
                 orientation: 'vertical'
-                canvas:
+                canvas.before:
                     Color:
                         rgba: hsGreen
                     Rectangle:
@@ -141,7 +140,7 @@
 
             BoxLayout:
                 orientation: 'vertical'
-                canvas:
+                canvas.before:
                     Color:
                         rgba: hsGreen
                     Rectangle:
@@ -212,7 +211,7 @@
                         size_hint_x: 0.25
             BoxLayout:
                 orientation: 'vertical'
-                canvas:
+                canvas.before:
                     Color:
                         rgba: hsGreen
                     Rectangle:

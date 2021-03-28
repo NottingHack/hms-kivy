@@ -40,6 +40,7 @@ from ..utils import load_kv
 
 class HomeScreen(Screen):
     balance = StringProperty("")
+    member_status_string = StringProperty("")
     register_rfid_allowed = BooleanProperty(False)
     meeting_check_in_allowed = BooleanProperty(False)
     _app = None
@@ -55,10 +56,15 @@ class HomeScreen(Screen):
         self.user = self._app.user
         self._app.set_home_button("Logged in", True)
         self._app.update_title(f"Welcome {self.user.get_name()}")
-        self.balance = f"Snackspace balance: £{(self.user.get_balance() / 100):.2f}"
+        self.balance = f"{((self.user.get_balance() or 0) / 100):.2f}"
+        self.member_status_string = self.user.get_member_status_string() or ""
 
-        # self.register_rfid_allowed = self.user.can("search.users") and self.user.can("pins.reactivate")
-        # self.meeting_check_in_allowed = self.user.can("governance.meeting.checkIn") # and next agm?
+        self.register_rfid_allowed = self.user.can("search.users") and self.user.can(
+            "pins.reactivate"
+        )
+        self.meeting_check_in_allowed = self.user.can(
+            "governance.meeting.checkIn"
+        )  # and next agm?
 
     def on_leave(self):
         Logger.debug("HomeScreen: on_leave")

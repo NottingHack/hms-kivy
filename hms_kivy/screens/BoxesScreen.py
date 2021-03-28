@@ -31,6 +31,14 @@ import json
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
+from kivy.properties import (
+    ObjectProperty,
+    ListProperty,
+    StringProperty,
+    NumericProperty,
+)
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import Screen
 
 from ..utils import load_kv
@@ -40,7 +48,7 @@ from ..hms import Boxes
 class BoxesScreen(Screen):
     _app = None
     user = None
-    boxes = None
+    boxes = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super(BoxesScreen, self).__init__(**kwargs)
@@ -54,7 +62,7 @@ class BoxesScreen(Screen):
         self._app.home_button.bind(on_release=self.on_home_pressed)
 
         self.boxes = Boxes(self._app.hms)
-        self.boxes.index(self.index_cb)
+        self.fetchBoxes()
 
     def on_leave(self):
         Logger.debug("BoxesScreen: on_leave")
@@ -64,8 +72,57 @@ class BoxesScreen(Screen):
         Logger.debug("BoxesScreen: on_home_pressed")
         self._app.set_screen("home")
 
-    def index_cb(self):
+    def fetchBoxes(self):
+        self.boxes.index(self.index_cb)
+
+    def index_cb(self, boxes):
         Logger.debug("BoxesScreen: index_cb")
+        self.rv.data = [
+            {
+                "box": box,
+                "box_id": box.id,
+                "bought_date": box.bought_date or "None",
+                "removed_date": box.removed_date or "None",
+                "state_string": box.state_string,
+                "mark_string": box.mark_string(),
+            }
+            for box in boxes
+        ]
+
+
+class BoxViewRow(BoxLayout):
+    box = ObjectProperty(None)
+    box_id = NumericProperty()
+    bought_date = StringProperty()
+    removed_date = StringProperty()
+    state_string = StringProperty()
+    mark_string = StringProperty()
+
+    def __init__(self):
+        super(BoxViewRow, self).__init__()
+        # self.box = box
+
+    def print(self):
+        Logger.debug(f"BoxViewRow ({self.box.id}): print")
+        self.box.print(_print_cb)
+
+    def _print_cb(self, *args):
+        Logger.debug(f"BoxViewRow ({self.box.id}): _print_cb")
+
+    def mark(self):
+        Logger.debug(f"BoxViewRow ({self.box.id}): mark")
+        Logger.debug(self.box)
+        Logger.debug(self.box.bought_date)
+
+        return self.box.mark(self._mark_cb)
+
+    def _mark_cb(self, failed_reason=None):
+        Logger.debug(f"BoxViewRow ({self.box.id}): _mark_cb")
+        self.removed_date = self.box.removed_date or "None"
+        self.state_string = self.box.state_string
+        self.mark_string = self.box.mark_string()
+        if failed_reason is not None:
+            Logger.debug(f"BoxViewRow ({self.box.id}): failed: {failed_reason}")
 
 
 load_kv()

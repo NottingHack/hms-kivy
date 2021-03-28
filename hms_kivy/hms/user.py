@@ -137,32 +137,38 @@ class User:
             on_success(self.uid)
 
     def get_name(self):
-        if self.user:
+        if self.user and "name" in self.user:
             return self.user["name"]
 
         return None
 
     def get_username(self):
-        if self.user:
+        if self.user and "username" in self.user:
             return self.user["username"]
 
         return None
 
     def get_email(self):
-        if self.user:
+        if self.user and "email" in self.user:
             return self.user["email"]
 
         return None
 
     def get_fullname(self):
-        if self.user:
+        if self.user and "fullname" in self.user:
             return self.user["fullname"]
 
         return None
 
     def get_balance(self):
-        if self.user:
+        if self.user and "profile" in self.user and "balance" in self.user["profile"]:
             return self.user["profile"]["balance"]
+
+        return None
+
+    def get_member_status_string(self):
+        if self.user and "memberStatusString" in self.user:
+            return self.user["memberStatusString"]
 
         return None
 

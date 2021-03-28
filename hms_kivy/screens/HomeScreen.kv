@@ -3,7 +3,7 @@
 <HomeScreen>:
     name: 'home'
 
-    canvas:
+    canvas.before:
         Color:
             rgba: hsGreen
         Rectangle:
@@ -12,56 +12,59 @@
 
     BoxLayout:
         orientation: 'vertical'
-        # orientation: 'horizontal'
-        padding: dp(5),dp(2),dp(5),dp(2)
         spacing: dp(5)
-        # BoxLayout:
-            # orientation: 'horizontal'
-            #
+        padding: dp(10),dp(5),dp(10),dp(5)
         GridLayout:
-            cols:2
-
             id: buttons_gird
-            padding: dp(15),dp(5),dp(15),dp(5)
+            cols:2
             spacing: dp(15)
+            padding: dp(10),dp(5),dp(10),dp(5)
 
-            font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
+            # canvas.before:
+            #     Color:
+            #         rgba: 0, 1, .5, .5
+            #     Rectangle:
+            #         pos: self.pos
+            #         size: self.size
+
             Button:
                 id: projects
+                font_size: '32sp'
                 text: "Projects"
-                font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
                 on_release: root.on_projects()
             Button:
                 id: boxes
-                font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
+                font_size: '32sp'
                 text: "Boxes"
                 on_release: root.on_boxes()
             Button:
                 id: register_rfid
-                font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
+                font_size: '32sp'
                 text: "Register RFID"
                 opacity: 1.0 if root.register_rfid_allowed else 0
                 disabled: not root.register_rfid_allowed
                 on_release: root.on_register_rfid()
             Button:
                 id: meeting_check_in
-                font_size: '32sp' #(root.width**2 + root.height**2) / 13**4
+                font_size: '32sp'
                 text: "Meeting Check In"
                 opacity: 1.0 if root.meeting_check_in_allowed else 0
                 disabled: not root.meeting_check_in_allowed
                 on_release: root.on_meeting_check_in()
 
         GridLayout:
-            cols:2
             id: bottom_layout
-            # orientation: 'horizontal'
-            size_hint_y: None
-
-            padding: dp(15),dp(5),dp(15),dp(5)
-            spacing: dp(2)
+            cols:2
+            size_hint_y: 0.1
 
             Label:
                 id: balance
-                text: root.balance
+                text: 'Snackspace balance: £' +root.balance
                 font_size: '25sp'
-                text_size: self.size
+                halign: 'left'
+
+            Label:
+                id: member_status
+                text: 'Member Status: ' + root.member_status_string
+                font_size: '25sp'
+                halign: 'left'

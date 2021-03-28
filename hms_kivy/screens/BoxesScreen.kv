@@ -2,11 +2,98 @@
 
 <BoxesScreen>:
     name: 'boxes'
+    rv: rv
 
-    canvas:
+    canvas.before:
         Color:
             rgba: hsGreen
         Rectangle:
             pos: self.pos
             size: self.size
 
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: dp(5)
+        padding: dp(10),dp(5),dp(10),dp(5)
+
+        # Scroll list of your boxes
+
+        RecycleView:
+            id: rv
+            viewclass: 'BoxViewRow'
+            RecycleBoxLayout:
+                default_size: None, dp(56)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(5)
+
+<BoxViewRow>
+    orientation: 'horizontal'
+    spacing: dp(5)
+    padding: dp(10),dp(5),dp(10),dp(5)
+
+    canvas.before:
+        Color:
+            rgba: (1,1,1,0.2)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    GridLayout:
+        cols: 2
+        size_hint_x: 0.65
+        Label:
+            text: 'Box Id: {}'.format(root.box_id)
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            text: 'Bought Date: ' + root.bought_date
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            text: 'State: ' + root.state_string
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            text: 'Removed Date: ' + root.removed_date
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    Button:
+        id: print_button
+        # font_size: '20sp'
+        text: 'Print Label'
+        size_hint_x: None
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+
+        # text_size: self.size
+        # size_hint_y: None
+        # text_size: self.width, None
+        # height: self.texture_size[1]
+        # size: self.texture_size
+        on_release: root.print()
+    Button:
+        id: mark_button
+        # font_size: '32sp'
+        text: root.mark_string
+        size_hint_x: 0.2
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+
+        # size_hint_y: None
+        # text_size: self.width, None
+        # height: self.texture_size[1]
+        # size: self.texture_size
+        on_release: root.mark()
