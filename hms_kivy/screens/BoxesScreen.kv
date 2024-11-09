@@ -45,25 +45,26 @@
         cols: 2
         size_hint_x: 0.65
         Label:
-            text: 'Box Id: {}'.format(root.box_id)
+            text: 'Box Id: {}'.format(root.box.id if root.box else "")
             font_size: '20sp'
             text_size: self.size
             halign: 'left'
             valign: 'middle'
         Label:
-            text: 'Bought Date: ' + root.bought_date
+            text: 'Bought Date: ' + ((root.box.bought_date or "") if root.box else "")
+            # text: f"Bought Date: {root.box.bought_date or ''}"
             font_size: '20sp'
             text_size: self.size
             halign: 'left'
             valign: 'middle'
         Label:
-            text: 'State: ' + root.state_string
+            text: 'State: ' + (root.box.state_string if root.box else "")
             font_size: '20sp'
             text_size: self.size
             halign: 'left'
             valign: 'middle'
         Label:
-            text: 'Removed Date: ' + root.removed_date
+            text: 'Removed Date: ' + ((root.box.removed_date or "") if root.box else "")
             font_size: '20sp'
             text_size: self.size
             halign: 'left'
@@ -82,11 +83,11 @@
         # text_size: self.width, None
         # height: self.texture_size[1]
         # size: self.texture_size
-        on_release: root.print()
+        on_release: root.box.print()
     Button:
         id: mark_button
         # font_size: '32sp'
-        text: root.mark_string
+        text: root.box.mark_string() if root.box else "Mark ..."
         size_hint_x: 0.2
         text_size: self.size
         halign: 'center'
@@ -96,4 +97,4 @@
         # text_size: self.width, None
         # height: self.texture_size[1]
         # size: self.texture_size
-        on_release: root.mark()
+        on_release: root.box.mark()

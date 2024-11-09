@@ -100,8 +100,11 @@ class Projects:
             self._show_URL.format(project=project) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.projects = result["data"]
-            callback()
+            # if Project of this id is in projects update it and return that instance
+            # else add a new one to projects and return it
+            project = Project(self.hms, result["data"])
+            if callback is not None:
+                callback(project)
 
     def store(self, project_name, description, callback=None):
         Logger.debug(f"Projects: store {project_name}")
@@ -120,7 +123,10 @@ class Projects:
 
         if self._store_URL in request.url and request.resp_status == HTTPStatus.OK:
             self.projects = result["data"]
-            callback()
+            project = Project(self.hms, result["data"])
+            self.projects.append(project)
+            if callback is not None:
+                callback(project)
 
 
 class Project:
@@ -175,8 +181,9 @@ class Project:
             self._update_URL.format(project=self.id) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.projects = result["data"]
-            callback()
+            self._populate_from_project(result["data"])
+            if callback is not None:
+                callback()
 
     def print(self, callback=None):
         Logger.debug(f"Project ({self.id}): print")
@@ -196,10 +203,10 @@ class Project:
 
         if (
             self._print_URL.format(project=self.id) in request.url
-            and request.resp_status == HTTPStatus.OK
+            and request.resp_status == HTTPStatus.ACCEPTED
         ):
-            self.projects = result["data"]
-            callback()
+            if callback is not None:
+                callback()
 
     def mark_active(self, callback=None):
         Logger.debug(f"Project ({self.id}): mark_active")
@@ -222,7 +229,8 @@ class Project:
             and request.resp_status == HTTPStatus.OK
         ):
             self.projects = result["data"]
-            callback()
+            if callback is not None:
+                callback()
 
     def mark_abandoned(sect, callback=None):
         Logger.debug(f"Project ({self.id}): mark_abandoned")
@@ -244,8 +252,9 @@ class Project:
             self._mark_abandoned_URL.format(project=self.id) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.projects = result["data"]
-            callback()
+
+            if callback is not None:
+                callback()
 
     def mark_complete(sect, callback=None):
         Logger.debug(f"Project ({self.id}): mark_complete")
@@ -267,5 +276,6 @@ class Project:
             self._mark_complete_URL.format(project=self.id) in request.url
             and request.resp_status == HTTPStatus.OK
         ):
-            self.projects = result["data"]
-            callback()
+
+            if callback is not None:
+                callback()

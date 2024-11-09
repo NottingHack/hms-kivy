@@ -29,7 +29,14 @@ __all__ = ("Boxes",)
 import json
 from http import HTTPStatus
 
+from kivy.event import EventDispatcher
 from kivy.logger import Logger
+from kivy.properties import (
+    ObjectProperty,
+    ListProperty,
+    StringProperty,
+    NumericProperty,
+)
 
 # states
 INUSE = 10
@@ -105,21 +112,22 @@ class Boxes:
                 callback(box)
 
 
-class Box:
+class Box(EventDispatcher):
     hms = None
-    id = None
-    bought_date = None
-    removed_date = None
-    state = None
-    state_string = None
-    user_id = None
+    id = NumericProperty()
+    bought_date = StringProperty(None, allownone=True)
+    removed_date = StringProperty(None, allownone=True)
+    state = NumericProperty()
+    state_string = StringProperty()
+    user_id = NumericProperty()
 
     _mark_in_use_URL = "api/boxes/{box}/markInUse"  # PATCH
     _mark_abandoned_URL = "api/boxes/{box}/markAbandoned"  # PATCH
     _mark_removed_URL = "api/boxes/{box}/markRemoved"  # PATCH
     _print_URL = "api/boxes/{box}/print"  # POST
 
-    def __init__(self, hms, box):
+    def __init__(self, hms, box, **kwargs):
+        super(Box, self).__init__(**kwargs)
         self.hms = hms
         self._populate_from_box(box)
 
@@ -204,7 +212,7 @@ class Box:
             and request.resp_status == HTTPStatus.FORBIDDEN
         ):
             if callback is not None:
-                callback(result["errors"][0]["detail"])
+                callback(failed_reason=result["errors"][0]["detail"])
 
     def mark_abandoned(self, callback=None):
         Logger.debug(f"Box ({self.id}): mark_abandoned")
@@ -228,13 +236,13 @@ class Box:
         ):
             self._populate_from_box(result["data"])
             if callback is not None:
-                callback()
+                callback(self)
         elif (
             self._mark_abandoned_URL.format(box=self.id) in request.url
             and request.resp_status == HTTPStatus.FORBIDDEN
         ):
             if callback is not None:
-                callback(result["errors"][0]["detail"])
+                callback(self, result["errors"][0]["detail"])
 
     def mark_removed(self, callback=None):
         Logger.debug(f"Box ({self.id}): mark_removed")
@@ -264,4 +272,4 @@ class Box:
             and request.resp_status == HTTPStatus.FORBIDDEN
         ):
             if callback is not None:
-                callback(result["errors"][0]["detail"])
+                callback(failed_reason=result["errors"][0]["detail"])

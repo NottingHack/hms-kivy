@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """ HMS Kiosk (HMS module)
 
     Author: Matt Lloyd

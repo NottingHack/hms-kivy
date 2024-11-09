@@ -39,6 +39,7 @@ from kivy.properties import (
 )
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import Screen
 
 from ..utils import load_kv
@@ -80,23 +81,23 @@ class BoxesScreen(Screen):
         self.rv.data = [
             {
                 "box": box,
-                "box_id": box.id,
-                "bought_date": box.bought_date or "None",
-                "removed_date": box.removed_date or "None",
-                "state_string": box.state_string,
-                "mark_string": box.mark_string(),
+                # "box_id": box.id,
+                # "bought_date": box.bought_date or "None",
+                # "removed_date": box.removed_date or "None",
+                # "state_string": box.state_string,
+                # "mark_string": box.mark_string(),
             }
             for box in boxes
         ]
 
 
-class BoxViewRow(BoxLayout):
+class BoxViewRow(RecycleDataViewBehavior, BoxLayout):
     box = ObjectProperty(None)
-    box_id = NumericProperty()
-    bought_date = StringProperty()
-    removed_date = StringProperty()
-    state_string = StringProperty()
-    mark_string = StringProperty()
+    # box_id = NumericProperty()
+    # bought_date = StringProperty()
+    # removed_date = StringProperty()
+    # state_string = StringProperty()
+    # mark_string = StringProperty()
 
     def __init__(self):
         super(BoxViewRow, self).__init__()
@@ -111,16 +112,17 @@ class BoxViewRow(BoxLayout):
 
     def mark(self):
         Logger.debug(f"BoxViewRow ({self.box.id}): mark")
-        Logger.debug(self.box)
-        Logger.debug(self.box.bought_date)
+        # Logger.debug(self.box)
+        # Logger.debug(self.box.bought_date)
 
         return self.box.mark(self._mark_cb)
 
     def _mark_cb(self, failed_reason=None):
         Logger.debug(f"BoxViewRow ({self.box.id}): _mark_cb")
-        self.removed_date = self.box.removed_date or "None"
-        self.state_string = self.box.state_string
-        self.mark_string = self.box.mark_string()
+        # self.removed_date = self.box.removed_date or "None"
+        # self.state_string = self.box.state_string
+        # self.mark_string = self.box.mark_string()
+        # self.box = box
         if failed_reason is not None:
             Logger.debug(f"BoxViewRow ({self.box.id}): failed: {failed_reason}")
 
