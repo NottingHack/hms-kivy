@@ -31,7 +31,17 @@ import json
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
+from kivy.properties import (
+    ObjectProperty,
+    ListProperty,
+    StringProperty,
+    NumericProperty,
+)
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 
 from ..utils import load_kv
 from ..hms import Projects
@@ -41,6 +51,7 @@ class ProjectsScreen(Screen):
     _app = None
     user = None
     projects = None
+    status_text = StringProperty("Loading")
 
     def __init__(self, **kwargs):
         super(ProjectsScreen, self).__init__(**kwargs)
@@ -64,8 +75,47 @@ class ProjectsScreen(Screen):
         Logger.debug("ProjectsScreen: on_home_pressed")
         self._app.set_screen("home")
 
-    def index_cb(self):
+    def index_cb(self, projects):
         Logger.debug("ProjectsScreen: index_cb")
+        self.rv.data = [
+            {
+                "project": project,
+                "project_id": project.id,
+                "project_name": project.project_name,
+                "description": project.description,
+                "state_string": project.state_string,
+            }
+            for project in projects
+        ]
+        self.status_text = "loaded " + str(len(projects)) + " projects"
+
+    def new_project(self):
+        Logger.debug("ProjectScreen: new_project")
+        self._app.set_screen("newProject")
+
+class ProjectViewRow(BoxLayout):
+    project = ObjectProperty(None)
+    project_id = NumericProperty()
+    project_name = StringProperty()
+    description = StringProperty()
+    state_string = StringProperty()
+
+    print_popup = None
+
+    def __init__(self):
+        super(ProjectViewRow, self).__init__()
+
+    def print(self):
+        Logger.debug(f"ProjectViewRow ({self.project.id}): print")
+        self.print_popup = Popup(title="Printing",
+                                 content=Label(text="Please wait a moment..."),
+                                 size_hint=(None,None), size=(400, 300))
+        self.print_popup.open()
+        self.project.print(self._print_cb)
+
+    def _print_cb(self, *args):
+        Logger.debug(f"ProjectViewRow ({self.project.id}): _print_cb")
+        self.print_popup.dismiss()
 
 
 load_kv()

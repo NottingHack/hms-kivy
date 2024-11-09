@@ -58,6 +58,7 @@ from .screens import (
     ProjectsScreen,
     BoxesScreen,
     RfidRegistrationScreen,
+    NewProjectScreen,
 )
 
 
@@ -71,6 +72,7 @@ class ScreenSwitcher(ScreenManager):
         self.add_widget(ProjectsScreen())
         self.add_widget(BoxesScreen())
         self.add_widget(RfidRegistrationScreen())
+        self.add_widget(NewProjectScreen())
 
 
 # TopBar Digital Clock

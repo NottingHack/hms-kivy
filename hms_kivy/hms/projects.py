@@ -111,14 +111,14 @@ class Projects:
             self._store_URL,
             lambda request, result, callback=callback: self._store_cb(
                 request, result, callback
-            ),
+            ), data
         )
 
     def _store_cb(self, request, result, callback=None):
         Logger.debug(f"Projects: _store_cb {request.url} {request.resp_status}")
         Logger.debug(f"Projects: _store_cb {result}")
 
-        if self._store_URL in request.url and request.resp_status == HTTPStatus.OK:
+        if self._store_URL in request.url and request.resp_status == HTTPStatus.CREATED:
             self.projects = result["data"]
             callback()
 
@@ -181,7 +181,7 @@ class Project:
     def print(self, callback=None):
         Logger.debug(f"Project ({self.id}): print")
 
-        return self.hms.patch_request(
+        return self.hms.post_request(
             self._print_URL.format(project=self.id),
             lambda request, result, callback=callback: self._print_cb(
                 request, result, callback
@@ -196,9 +196,8 @@ class Project:
 
         if (
             self._print_URL.format(project=self.id) in request.url
-            and request.resp_status == HTTPStatus.OK
+            and request.resp_status == HTTPStatus.ACCEPTED
         ):
-            self.projects = result["data"]
             callback()
 
     def mark_active(self, callback=None):

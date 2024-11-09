@@ -11,3 +11,4 @@ from .HomeScreen import *
 from .ProjectsScreen import *
 from .BoxesScreen import *
 from .RfidRegistrationScreen import *
+from .NewProjectScreen import *

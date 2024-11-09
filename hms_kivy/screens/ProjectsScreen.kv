@@ -2,6 +2,7 @@
 
 <ProjectsScreen>:
     name: 'projects'
+    rv: rv
 
     canvas.before:
         Color:
@@ -9,4 +10,76 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: dp(5)
+        padding: dp(10),dp(5),dp(10),dp(5)
+
+        # Scroll list of your boxes
+
+        RecycleView:
+            id: rv
+            viewclass: 'ProjectViewRow'
+            RecycleBoxLayout:
+                default_size: None, dp(56)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: dp(5)
+
+        GridLayout:
+            id: bottom_layout
+            cols: 2
+            size_hint_y: 0.1
+
+            Label:
+                id: status
+                text: root.status_text
+                font_size: '25sp'
+                halign: 'left'
+
+            Button:
+                id: new_project
+                text: 'Create'
+                font_size: '25sp'
+                on_release: root.new_project()
+
+
+<ProjectViewRow>
+    orientation: 'horizontal'
+    spacing: dp(5)
+    padding: dp(10),dp(5),dp(10),dp(5)
+
+    canvas.before:
+        Color:
+            rgba: (1,1,1,0.2)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    GridLayout:
+        cols: 2
+        size_hint_x: 0.65
+        Label:
+            text: 'Name: ' + root.project_name
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            text: 'Status: ' + root.state_string
+            font_size: '20sp'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    Button:
+        id: print_button
+        text: 'Print Label'
+        size_hint_x: None
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+        on_release: root.print()
 
