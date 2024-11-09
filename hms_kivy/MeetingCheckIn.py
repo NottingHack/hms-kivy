@@ -147,7 +147,8 @@ class HMS:
     def startRFID(self):
         # start checking RFID's
         self.rfid.start_RFID_read()
-        self.eventCheckRFID = Clock.schedule_interval(self.checkForRFID, 0.5)
+        self.rfid.bind(on_present=self.on_rfid_present)
+        # self.eventCheckRFID = Clock.schedule_interval(self.checkForRFID, 0.5)
         # start update counts every 10 sec
         self.eventUpdateCounts = Clock.schedule_interval(self.updateCounts, 5)
 
@@ -199,41 +200,36 @@ class HMS:
     def newCounts(self, request, result):
         self.updateCheckInCounts(result)
 
-    def checkForRFID(self, *args):
-        try:
-            uid = self.rfid.q_RFID.get_nowait()
-        except queue.Empty:
-            pass
-        else:
-            self.checkInScreen.statusMessage = "Checking Card"
-            params = json.dumps(
-                {
-                    "rfidSerial": uid.decode("utf-8"),
-                }
-            )
-            headers = {
-                "Content-type": "application/json",
-                "Accept": "application/json",
-                "Authorization": "{} {}".format(
-                    self._token["token_type"], self._token["access_token"]
-                ),
+    def on_rfid_present(self, obj, uid):
+        self.checkInScreen.statusMessage = "Checking Card"
+        params = json.dumps(
+            {
+                "rfidSerial": uid
             }
+        )
+        headers = {
+            "Content-type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "{} {}".format(
+                self._token["token_type"], self._token["access_token"]
+            ),
+        }
 
-            UrlRequest(
-                url=self._meetingCheckInRfidURL.format(
-                    baseURL=self._baseURLProd if self.production else self._baseURLDev,
-                    meeting=self._meetinId,
-                ),
-                req_body=params,
-                req_headers=headers,
-                on_error=self.checkInError,
-                on_failure=self.checkInFailure,
-                on_progress=None,
-                on_redirect=self.checkInRedirect,
-                on_success=self.checkInSuccess,
-                timeout=5,
-                verify=self.production,
-            )
+        UrlRequest(
+            url=self._meetingCheckInRfidURL.format(
+                baseURL=self._baseURLProd if self.production else self._baseURLDev,
+                meeting=self._meetinId,
+            ),
+            req_body=params,
+            req_headers=headers,
+            on_error=self.checkInError,
+            on_failure=self.checkInFailure,
+            on_progress=None,
+            on_redirect=self.checkInRedirect,
+            on_success=self.checkInSuccess,
+            timeout=5,
+            verify=self.production,
+        )
 
     def checkInError(self, request, result):
         print("HMS: Check-in Error")
