@@ -1,0 +1,57 @@
+#:kivy 1.0
+
+<NewProjectScreen>:
+    name: 'newProject'
+    project_name: project_name
+    project_description: project_description
+
+    canvas.before:
+        Color:
+            rgba: hsGreen
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: dp(5)
+        padding: dp(10),dp(5),dp(10),dp(5)
+
+        GridLayout:
+            id: project_attributes
+            cols: 2
+            size_hint_y: 0.1
+
+            Label:
+                text: "Project Name:"
+                font_size: '25sp'
+                halign: 'left'
+                size_hint: 0.01, None
+
+            TextInput:
+                id: project_name
+                font_size: '25sp'
+                halign: 'left'
+                multiline: False
+                size_hint: 0.01, None
+
+            Label:
+                text: "Project Description:"
+                font_size: '25sp'
+
+            TextInput:
+                id: project_description
+                font_size: '25sp'
+                halign: 'left'
+                multiline: True
+
+            Label:
+                text: ""
+                size_hint: 0.01, None
+
+            Button:
+                id: create_project
+                text: 'Create'
+                font_size: '25sp'
+                on_release: root.create_project()
+                size_hint: 0.01, None
