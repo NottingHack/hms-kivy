@@ -32,17 +32,25 @@ import urllib.request, urllib.parse, urllib.error
 import time
 import queue
 import json
+import os
+
+from kivy.logger import Logger, LOG_LEVELS
+Logger.setLevel(LOG_LEVELS["debug"])
 
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.label import Label
+from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
 
 from .rfid import RFID
 
+Builder.load_file(os.path.join(os.path.dirname(__file__), "style.kv"))
+
+rfid = RFID()
 
 class HMS:
     # default client credentials
@@ -66,8 +74,6 @@ class HMS:
 
     checkInScreen = None
     connecScreen = None
-
-    rfid = RFID()
 
     def getToken(self, success, fail):
         self._tokenSuccessCallback = success
@@ -136,6 +142,7 @@ class HMS:
     def foundNext(self, request, result):
         print("HMS: Found next meeting")
         self._meetinId = result["id"]
+        print("HMS: Meeting " + result['title'])
         self.checkInScreen.updateTitle(result["title"])
         self._resetStatusMessage()
         self.updateCheckInCounts(result)
@@ -146,14 +153,14 @@ class HMS:
 
     def startRFID(self):
         # start checking RFID's
-        self.rfid.start_RFID_read()
-        self.rfid.bind(on_present=self.on_rfid_present)
+        rfid.start_RFID_read()
+        rfid.bind(on_present=self.on_rfid_present)
         # self.eventCheckRFID = Clock.schedule_interval(self.checkForRFID, 0.5)
         # start update counts every 10 sec
         self.eventUpdateCounts = Clock.schedule_interval(self.updateCounts, 5)
 
     def stopRFID(self):
-        self.rfid.stop_RFID_read()
+        rfid.stop_RFID_read()
         try:
             self.eventCheckRFID.cancel()
             self.eventUpdateCounts.cancel()
@@ -349,6 +356,15 @@ class MeetingCheckInApp(App):
     def on_stop(self, *args):
         hms.stopRFID()
 
+    def build_config(self, config):
+        # hms.build_config(config)
+        rfid.build_config(config)
+
+    def build_settings(self, settings):
+        rfid.build_settings(settings, self.config)
+
+    def on_config_change(self, config, section, key, value):
+        rfid.on_config_change(config, section, key, value)
 
 def main():
     Window.size = (800, 480)

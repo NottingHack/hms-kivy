@@ -37,20 +37,20 @@
                 font_size: '32sp'
                 text: "Boxes"
                 on_release: root.on_boxes()
-            Button:
-                id: register_rfid
-                font_size: '32sp'
-                text: "Register RFID"
-                opacity: 1.0 if root.register_rfid_allowed else 0
-                disabled: not root.register_rfid_allowed
-                on_release: root.on_register_rfid()
-            Button:
-                id: meeting_check_in
-                font_size: '32sp'
-                text: "Meeting Check In"
-                opacity: 1.0 if root.meeting_check_in_allowed else 0
-                disabled: not root.meeting_check_in_allowed
-                on_release: root.on_meeting_check_in()
+            # Button:
+            #     id: register_rfid
+            #     font_size: '32sp'
+            #     text: "Register RFID"
+            #     opacity: 1.0 if root.register_rfid_allowed else 0
+            #     disabled: not root.register_rfid_allowed
+            #     on_release: root.on_register_rfid()
+            # Button:
+            #     id: meeting_check_in
+            #     font_size: '32sp'
+            #     text: "Meeting Check In"
+            #     opacity: 1.0 if root.meeting_check_in_allowed else 0
+            #     disabled: not root.meeting_check_in_allowed
+            #     on_release: root.on_meeting_check_in()
 
         GridLayout:
             id: bottom_layout
