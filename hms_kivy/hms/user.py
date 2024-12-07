@@ -35,7 +35,7 @@ from kivy.logger import Logger
 class User:
     hms = None
     _user_URL = "api/users"
-    _can_check_URL = "api/can"
+    _can_check_URL = "api/user/can"
 
     # initial permissions to check when first doing a user login
     _initial_permissions_to_check = {
